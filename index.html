@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+
+    <!-- PWA Meta Tags -->
+    <meta name="application-name" content="One Rep Strength">
+    <meta name="description" content="Voice-guided High-Intensity Training coach for building strength efficiently">
+    <meta name="theme-color" content="#FFD700">
+
+    <!-- iOS Meta Tags -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="One Rep">
+
+    <!-- Apple Touch Icons -->
+    <link rel="apple-touch-icon" sizes="180x180" href="/icons/icon-180.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="/icons/icon-152.png">
+    <link rel="apple-touch-icon" sizes="144x144" href="/icons/icon-144.png">
+    <link rel="apple-touch-icon" sizes="120x120" href="/icons/icon-120.png">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/icons/favicon-16.png">
+
+    <!-- Manifest -->
+    <link rel="manifest" href="/manifest.json">
+
+    <title>One Rep Strength</title>
+    <link rel="stylesheet" href="app.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Status Bar -->
+        <div class="status-bar">
+            <span class="status-time" id="statusTime">9:41</span>
+            <span class="status-icons">100%</span>
+        </div>
+
+        <!-- ========== MAIN WORKOUT LIST SCREEN ========== -->
+        <div class="screen active" id="workoutListScreen">
+            <!-- Header with Profile Switcher -->
+            <header class="main-header">
+                <button class="icon-btn" id="profileBtn" onclick="showProfileModal()">
+                    <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="8" r="4"/>
+                        <path d="M4 20c0-4 4-6 8-6s8 2 8 6"/>
+                    </svg>
+                </button>
+
+                <!-- Profile Switcher -->
+                <div class="profile-switcher">
+                    <button class="profile-btn active" id="profile1Btn" onclick="selectProfile(1)">P1</button>
+                    <button class="profile-btn" id="profile2Btn" onclick="selectProfile(2)">P2</button>
+                </div>
+
+                <div class="header-actions">
+                    <button class="icon-btn" onclick="showHistoryScreen()">
+                        <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="4" width="18" height="16" rx="2"/>
+                            <path d="M7 8h4M7 12h10M7 16h6"/>
+                        </svg>
+                    </button>
+                    <button class="icon-btn" onclick="showSettingsScreen()">
+                        <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="3"/>
+                            <path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/>
+                        </svg>
+                    </button>
+                </div>
+            </header>
+
+            <!-- Workout A/B Selector -->
+            <div class="workout-selector">
+                <button class="workout-type-btn active" id="workoutABtn" onclick="selectWorkoutType('A')">
+                    Workout A
+                </button>
+                <button class="workout-type-btn" id="workoutBBtn" onclick="selectWorkoutType('B')">
+                    Workout B
+                </button>
+            </div>
+
+            <!-- Progress Counter -->
+            <div class="progress-row">
+                <div class="progress-info">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+                        <rect x="3" y="12" width="4" height="8"/>
+                        <rect x="10" y="8" width="4" height="12"/>
+                        <rect x="17" y="4" width="4" height="16"/>
+                    </svg>
+                    <span id="completedCount">0/8 Completed</span>
+                </div>
+                <div class="progress-actions">
+                    <button class="action-btn finish-btn" id="finishWorkoutBtn" onclick="finishWorkout()" style="display: none;">
+                        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M20 6L9 17l-5-5"/>
+                        </svg>
+                        Finish
+                    </button>
+                    <button class="action-btn reset-btn" onclick="resetWorkout()">
+                        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M3 12a9 9 0 109-9 9 9 0 00-9 9"/>
+                            <path d="M3 3v6h6"/>
+                        </svg>
+                        Reset
+                    </button>
+                </div>
+            </div>
+
+            <!-- Exercise List -->
+            <div class="exercise-list" id="exerciseList">
+                <!-- Exercises will be dynamically inserted here -->
+            </div>
+        </div>
+
+        <!-- ========== TIMER SCREEN ========== -->
+        <div class="screen" id="timerScreen">
+            <header class="timer-header">
+                <button class="close-btn" onclick="stopTimer()">
+                    <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M18 6L6 18M6 6l12 12"/>
+                    </svg>
+                </button>
+                <span class="timer-exercise-name" id="timerExerciseName">Exercise</span>
+                <div style="width: 24px;"></div>
+            </header>
+
+            <!-- Phase Indicators E-C-F -->
+            <div class="phase-indicators">
+                <div class="phase-dot" id="phaseDotE">E</div>
+                <div class="phase-connector"></div>
+                <div class="phase-dot" id="phaseDotC">C</div>
+                <div class="phase-connector"></div>
+                <div class="phase-dot" id="phaseDotF">F</div>
+            </div>
+
+            <!-- Timer Display -->
+            <div class="timer-display" id="timerDisplay">10</div>
+            <div class="phase-label" id="phaseLabel">Get Ready</div>
+
+            <!-- Timer Controls (shown during timer) -->
+            <div class="timer-controls" id="timerControls">
+                <button class="control-btn" onclick="resetPhase()">
+                    <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M3 12a9 9 0 109-9 9 9 0 00-9 9"/>
+                        <path d="M3 3v6h6"/>
+                    </svg>
+                </button>
+                <button class="control-btn play-btn" id="playPauseBtn" onclick="toggleTimer()">
+                    <svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor" id="playIcon">
+                        <polygon points="5,3 19,12 5,21"/>
+                    </svg>
+                    <svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor" id="pauseIcon" style="display: none;">
+                        <rect x="6" y="4" width="4" height="16"/>
+                        <rect x="14" y="4" width="4" height="16"/>
+                    </svg>
+                </button>
+                <button class="control-btn" onclick="skipPhase()">
+                    <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+                        <polygon points="5,4 15,12 5,20"/>
+                        <rect x="15" y="4" width="4" height="16"/>
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Complete Section (shown after exercise finishes) -->
+            <div class="complete-section" id="completeSection" style="display: none;">
+                <!-- Weight Input -->
+                <div class="weight-section">
+                    <h3>Log Weight</h3>
+                    <div class="weight-controls">
+                        <button class="weight-btn large" onclick="adjustWeight(-5)">
+                            <svg viewBox="0 0 24 24" width="32" height="32" fill="currentColor">
+                                <circle cx="12" cy="12" r="10"/>
+                                <rect x="6" y="11" width="12" height="2" fill="#000"/>
+                            </svg>
+                        </button>
+                        <div class="weight-display">
+                            <span class="weight-value" id="weightValue">0</span>
+                            <span class="weight-unit">lbs</span>
+                        </div>
+                        <button class="weight-btn large" onclick="adjustWeight(5)">
+                            <svg viewBox="0 0 24 24" width="32" height="32" fill="currentColor">
+                                <circle cx="12" cy="12" r="10"/>
+                                <rect x="6" y="11" width="12" height="2" fill="#000"/>
+                                <rect x="11" y="6" width="2" height="12" fill="#000"/>
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="fine-adjust">
+                        <button class="adjust-btn" onclick="adjustWeight(-2.5)">-2.5</button>
+                        <button class="adjust-btn" onclick="adjustWeight(2.5)">+2.5</button>
+                    </div>
+                </div>
+
+                <!-- Reached Failure Toggle -->
+                <button class="failure-toggle" id="failureToggle" onclick="toggleFailure()">
+                    <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" id="failureUnchecked">
+                        <circle cx="12" cy="12" r="10"/>
+                    </svg>
+                    <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor" id="failureChecked" style="display: none;">
+                        <circle cx="12" cy="12" r="10" fill="#22c55e"/>
+                        <path d="M7 12l3 3 7-7" stroke="#000" stroke-width="2" fill="none"/>
+                    </svg>
+                    <span>Reached Failure</span>
+                </button>
+
+                <!-- Log Set Button -->
+                <button class="primary-btn" onclick="logSetAndDone()">
+                    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M20 6L9 17l-5-5"/>
+                    </svg>
+                    Log Set
+                </button>
+
+                <!-- Secondary Actions -->
+                <div class="secondary-actions">
+                    <button class="secondary-btn" onclick="logAndStartRest()">
+                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"/>
+                            <path d="M12 6v6l4 2"/>
+                        </svg>
+                        Rest
+                    </button>
+                    <button class="secondary-btn" onclick="logAndAnotherSet()">
+                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M3 12a9 9 0 109-9 9 9 0 00-9 9"/>
+                            <path d="M3 3v6h6"/>
+                        </svg>
+                        Another Set
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========== REST SCREEN ========== -->
+        <div class="screen" id="restScreen">
+            <header class="timer-header">
+                <button class="close-btn" onclick="stopTimer()">
+                    <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M18 6L6 18M6 6l12 12"/>
+                    </svg>
+                </button>
+                <span class="timer-exercise-name">Rest</span>
+                <div style="width: 24px;"></div>
+            </header>
+
+            <div class="rest-content">
+                <div class="rest-timer" id="restTimerDisplay">90</div>
+                <div class="rest-label">seconds</div>
+
+                <div class="next-exercise">
+                    <span class="next-label">Next:</span>
+                    <span class="next-name" id="nextExerciseName">Exercise Name</span>
+                </div>
+
+                <button class="skip-btn" onclick="skipRest()">Skip</button>
+            </div>
+        </div>
+
+        <!-- ========== HISTORY SCREEN ========== -->
+        <div class="screen" id="historyScreen">
+            <header class="screen-header">
+                <button class="close-btn" onclick="showWorkoutList()">
+                    <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M18 6L6 18M6 6l12 12"/>
+                    </svg>
+                </button>
+                <h2>Workout History</h2>
+                <div style="width: 24px;"></div>
+            </header>
+
+            <!-- Stats Header -->
+            <div class="stats-row">
+                <div class="stat-box">
+                    <span class="stat-title">Today</span>
+                    <span class="stat-value" id="todaySets">0</span>
+                    <span class="stat-subtitle">sets</span>
+                </div>
+                <div class="stat-box">
+                    <span class="stat-title">Total</span>
+                    <span class="stat-value" id="totalSets">0</span>
+                    <span class="stat-subtitle">sets logged</span>
+                </div>
+            </div>
+
+            <!-- History List -->
+            <div class="history-list" id="historyList">
+                <div class="empty-state" id="emptyHistory">
+                    <svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor" stroke-width="1">
+                        <rect x="3" y="4" width="18" height="16" rx="2"/>
+                        <path d="M7 8h4M7 12h10M7 16h6"/>
+                    </svg>
+                    <h3>No Sets Logged Yet</h3>
+                    <p>Complete exercises and tap "Log Set" to track your progress</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========== SETTINGS SCREEN ========== -->
+        <div class="screen" id="settingsScreen">
+            <header class="screen-header">
+                <button class="close-btn" onclick="showWorkoutList()">
+                    <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M18 6L6 18M6 6l12 12"/>
+                    </svg>
+                </button>
+                <h2>Settings</h2>
+                <button class="done-btn" onclick="showWorkoutList()">Done</button>
+            </header>
+
+            <div class="settings-content">
+                <!-- Voice Options -->
+                <div class="settings-section">
+                    <h3 class="section-title">Voice Options</h3>
+                    <div class="settings-group">
+                        <label class="setting-label">Standard Voices</label>
+                        <div class="voice-buttons">
+                            <button class="voice-btn" id="voiceMale" onclick="setVoice('male')">M</button>
+                            <button class="voice-btn" id="voiceFemale" onclick="setVoice('female')">F</button>
+                            <button class="voice-btn" id="voiceDigital" onclick="setVoice('digital')">D</button>
+                        </div>
+                        <label class="setting-label">Pro Voices</label>
+                        <button class="commander-btn" id="voiceCommander" onclick="setVoice('commander')">
+                            <span class="pro-badge">PRO</span>
+                            Commander
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Phase Timing -->
+                <div class="settings-section">
+                    <h3 class="section-title">Phase Timing</h3>
+                    <div class="phase-setting">
+                        <span class="phase-name">Prep</span>
+                        <div class="stepper">
+                            <button onclick="adjustPhaseSetting('prep', -5)">-</button>
+                            <span id="prepValue">10</span>s
+                            <button onclick="adjustPhaseSetting('prep', 5)">+</button>
+                        </div>
+                    </div>
+                    <div class="phase-setting">
+                        <span class="phase-name">Positioning</span>
+                        <div class="stepper">
+                            <button onclick="adjustPhaseSetting('positioning', -5)">-</button>
+                            <span id="positioningValue">5</span>s
+                            <button onclick="adjustPhaseSetting('positioning', 5)">+</button>
+                        </div>
+                    </div>
+                    <div class="phase-setting">
+                        <span class="phase-name">Eccentric</span>
+                        <div class="stepper">
+                            <button onclick="adjustPhaseSetting('eccentric', -5)">-</button>
+                            <span id="eccentricValue">30</span>s
+                            <button onclick="adjustPhaseSetting('eccentric', 5)">+</button>
+                        </div>
+                    </div>
+                    <div class="phase-setting">
+                        <span class="phase-name">Concentric</span>
+                        <div class="stepper">
+                            <button onclick="adjustPhaseSetting('concentric', -5)">-</button>
+                            <span id="concentricValue">20</span>s
+                            <button onclick="adjustPhaseSetting('concentric', 5)">+</button>
+                        </div>
+                    </div>
+                    <div class="phase-setting">
+                        <span class="phase-name">Final Eccentric</span>
+                        <div class="stepper">
+                            <button onclick="adjustPhaseSetting('finalEccentric', -5)">-</button>
+                            <span id="finalEccentricValue">40</span>s
+                            <button onclick="adjustPhaseSetting('finalEccentric', 5)">+</button>
+                        </div>
+                    </div>
+                    <div class="phase-setting">
+                        <span class="phase-name">Rest</span>
+                        <div class="stepper">
+                            <button onclick="adjustPhaseSetting('rest', -10)">-</button>
+                            <span id="restValue">90</span>s
+                            <button onclick="adjustPhaseSetting('rest', 10)">+</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- About -->
+                <div class="settings-section">
+                    <h3 class="section-title">About</h3>
+                    <div class="about-row">
+                        <span>Version</span>
+                        <span class="about-value">1.0.0</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========== TAB BAR ========== -->
+        <nav class="tab-bar">
+            <button class="tab active" id="tabWorkouts" onclick="switchTab('workouts')">
+                <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+                    <path d="M20.57 14.86L22 13.43 20.57 12 17 15.57 8.43 7 12 3.43 10.57 2 9.14 3.43 7.71 2 5.57 4.14 4.14 2.71 2.71 4.14l1.43 1.43L2 7.71l1.43 1.43L2 10.57 3.43 12 7 8.43 15.57 17 12 20.57 13.43 22l1.43-1.43L16.29 22l2.14-2.14 1.43 1.43 1.43-1.43-1.43-1.43L22 16.29z"/>
+                </svg>
+                <span>Workouts</span>
+            </button>
+            <button class="tab" id="tabStats" onclick="switchTab('stats')">
+                <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+                    <path d="M3 13h4v8H3v-8zm7-10h4v18h-4V3zm7 6h4v12h-4V9z"/>
+                </svg>
+                <span>Stats</span>
+            </button>
+            <button class="tab" id="tabLog" onclick="switchTab('log')">
+                <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+                    <path d="M3 5h18v2H3V5zm0 6h18v2H3v-2zm0 6h18v2H3v-2z"/>
+                </svg>
+                <span>Log</span>
+            </button>
+        </nav>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

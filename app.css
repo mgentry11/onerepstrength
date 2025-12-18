@@ -1,0 +1,1013 @@
+/* HIT Coach Pro - iOS Style Web App */
+/* Yellow/Gold Theme with Black Background */
+
+/* ===== VARIABLES ===== */
+:root {
+    --gold: #FFD700;
+    --gold-dark: #B8860B;
+    --gold-light: #FFED4A;
+    --black: #000000;
+    --gray-dark: #1C1C1E;
+    --gray-mid: #2C2C2E;
+    --gray-light: #3A3A3C;
+    --white: #FFFFFF;
+    --text-secondary: #8E8E93;
+    --blue: #007AFF;
+    --green: #22c55e;
+    --orange: #FF9500;
+    --red: #FF3B30;
+
+    /* Phase colors - matching iOS app */
+    --phase-eccentric: #007AFF;
+    --phase-concentric: #22c55e;
+    --phase-final: #FF9500;
+}
+
+/* ===== RESET ===== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+}
+
+html, body {
+    height: 100%;
+    overscroll-behavior: none;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', system-ui, sans-serif;
+    background: var(--black);
+    color: var(--white);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overflow: hidden;
+}
+
+/* ===== APP CONTAINER ===== */
+.app-container {
+    max-width: 100%;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    padding-bottom: 80px;
+}
+
+/* ===== STATUS BAR ===== */
+.status-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 24px;
+    font-size: 14px;
+    font-weight: 600;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: var(--black);
+}
+
+.status-time {
+    font-weight: 600;
+}
+
+/* ===== SCREENS ===== */
+.screen {
+    display: none;
+    flex: 1;
+    overflow-y: auto;
+    padding-bottom: 100px;
+}
+
+.screen.active {
+    display: flex;
+    flex-direction: column;
+}
+
+/* ===== MAIN HEADER ===== */
+.main-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    background: var(--black);
+}
+
+.icon-btn {
+    background: transparent;
+    border: none;
+    color: var(--gold);
+    padding: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.header-actions {
+    display: flex;
+    gap: 8px;
+}
+
+/* ===== PROFILE SWITCHER ===== */
+.profile-switcher {
+    display: flex;
+    gap: 8px;
+}
+
+.profile-btn {
+    width: 44px;
+    height: 44px;
+    border-radius: 22px;
+    border: 2px solid var(--gray-light);
+    background: var(--gray-dark);
+    color: var(--text-secondary);
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.profile-btn.active {
+    border-color: var(--gold);
+    background: var(--gold);
+    color: var(--black);
+}
+
+/* ===== WORKOUT TYPE SELECTOR ===== */
+.workout-selector {
+    display: flex;
+    gap: 12px;
+    padding: 16px;
+    justify-content: center;
+}
+
+.workout-type-btn {
+    flex: 1;
+    max-width: 160px;
+    padding: 14px 24px;
+    border: 2px solid var(--gray-light);
+    border-radius: 12px;
+    background: var(--gray-dark);
+    color: var(--white);
+    font-size: 17px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.workout-type-btn.active {
+    border-color: var(--gold);
+    background: var(--gold);
+    color: var(--black);
+}
+
+/* ===== PROGRESS ROW ===== */
+.progress-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    background: var(--gray-dark);
+    margin: 0 16px;
+    border-radius: 12px;
+}
+
+.progress-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--gold);
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.progress-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.action-btn {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: none;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.finish-btn {
+    background: var(--green);
+    color: var(--black);
+}
+
+.reset-btn {
+    background: var(--gray-mid);
+    color: var(--text-secondary);
+}
+
+/* ===== EXERCISE LIST ===== */
+.exercise-list {
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.exercise-card {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px;
+    background: var(--gray-dark);
+    border-radius: 16px;
+    border: 2px solid var(--gray-mid);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+}
+
+.exercise-card:active {
+    transform: scale(0.98);
+}
+
+.exercise-card.completed {
+    border-color: var(--green);
+    opacity: 0.9;
+}
+
+.exercise-icon {
+    width: 48px;
+    height: 48px;
+    flex-shrink: 0;
+}
+
+.exercise-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.exercise-name {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--white);
+    margin-bottom: 4px;
+}
+
+.exercise-weight {
+    font-size: 14px;
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.completed-check {
+    position: absolute;
+    right: 60px;
+}
+
+.start-btn {
+    width: 44px;
+    height: 44px;
+    border-radius: 22px;
+    border: none;
+    background: var(--gold);
+    color: var(--black);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+/* ===== TIMER SCREEN ===== */
+.timer-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px;
+    background: var(--black);
+}
+
+.close-btn {
+    background: transparent;
+    border: none;
+    color: var(--white);
+    padding: 8px;
+    cursor: pointer;
+}
+
+.timer-exercise-name {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--white);
+}
+
+/* ===== PHASE INDICATORS ===== */
+.phase-indicators {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 20px;
+}
+
+.phase-dot {
+    width: 44px;
+    height: 44px;
+    border-radius: 22px;
+    border: 3px solid var(--gray-light);
+    background: var(--gray-dark);
+    color: var(--text-secondary);
+    font-size: 16px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.phase-dot.active {
+    transform: scale(1.1);
+}
+
+#phaseDotE.active {
+    border-color: var(--phase-eccentric);
+    background: var(--phase-eccentric);
+    color: var(--white);
+}
+
+#phaseDotC.active {
+    border-color: var(--phase-concentric);
+    background: var(--phase-concentric);
+    color: var(--white);
+}
+
+#phaseDotF.active {
+    border-color: var(--phase-final);
+    background: var(--phase-final);
+    color: var(--white);
+}
+
+.phase-dot.past {
+    border-color: var(--gray-light);
+    background: var(--gray-mid);
+    color: var(--text-secondary);
+}
+
+.phase-connector {
+    width: 24px;
+    height: 3px;
+    background: var(--gray-light);
+}
+
+/* ===== TIMER DISPLAY ===== */
+.timer-display {
+    font-size: 140px;
+    font-weight: 200;
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', system-ui, sans-serif;
+    text-align: center;
+    color: var(--gold);
+    line-height: 1;
+    margin: 20px 0;
+    transition: color 0.3s ease;
+}
+
+.timer-display.phase-eccentric {
+    color: var(--phase-eccentric);
+}
+
+.timer-display.phase-concentric {
+    color: var(--phase-concentric);
+}
+
+.timer-display.phase-final {
+    color: var(--phase-final);
+}
+
+.timer-display.phase-complete {
+    color: var(--green);
+}
+
+.phase-label {
+    font-size: 24px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+/* ===== TIMER CONTROLS ===== */
+.timer-controls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 32px;
+    padding: 24px;
+}
+
+.control-btn {
+    width: 60px;
+    height: 60px;
+    border-radius: 30px;
+    border: none;
+    background: var(--gray-dark);
+    color: var(--white);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.control-btn.play-btn {
+    width: 80px;
+    height: 80px;
+    border-radius: 40px;
+    background: var(--gold);
+    color: var(--black);
+}
+
+/* ===== COMPLETE SECTION ===== */
+.complete-section {
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.weight-section {
+    text-align: center;
+}
+
+.weight-section h3 {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    margin-bottom: 16px;
+}
+
+.weight-controls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 24px;
+}
+
+.weight-btn {
+    background: transparent;
+    border: none;
+    color: var(--gold);
+    cursor: pointer;
+    padding: 8px;
+}
+
+.weight-btn.large svg {
+    width: 56px;
+    height: 56px;
+}
+
+.weight-display {
+    text-align: center;
+}
+
+.weight-value {
+    font-size: 64px;
+    font-weight: 700;
+    color: var(--gold);
+}
+
+.weight-unit {
+    font-size: 20px;
+    color: var(--text-secondary);
+    display: block;
+}
+
+.fine-adjust {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 12px;
+}
+
+.adjust-btn {
+    padding: 8px 16px;
+    border-radius: 8px;
+    border: 1px solid var(--gray-light);
+    background: var(--gray-dark);
+    color: var(--text-secondary);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+/* ===== FAILURE TOGGLE ===== */
+.failure-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 16px;
+    background: var(--gray-dark);
+    border-radius: 12px;
+    border: 2px solid var(--gray-mid);
+    color: var(--white);
+    font-size: 18px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.failure-toggle svg {
+    color: var(--text-secondary);
+}
+
+/* ===== PRIMARY BUTTON ===== */
+.primary-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 18px 24px;
+    background: var(--gold);
+    color: var(--black);
+    border: none;
+    border-radius: 14px;
+    font-size: 18px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.primary-btn:active {
+    transform: scale(0.98);
+}
+
+/* ===== SECONDARY ACTIONS ===== */
+.secondary-actions {
+    display: flex;
+    gap: 12px;
+}
+
+.secondary-btn {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 14px;
+    background: var(--gray-dark);
+    border: 2px solid var(--gray-mid);
+    border-radius: 12px;
+    color: var(--white);
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+/* ===== REST SCREEN ===== */
+.rest-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+}
+
+.rest-timer {
+    font-size: 160px;
+    font-weight: 200;
+    color: var(--gold);
+    line-height: 1;
+}
+
+.rest-label {
+    font-size: 24px;
+    color: var(--text-secondary);
+    margin-bottom: 40px;
+}
+
+.next-exercise {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.next-label {
+    font-size: 16px;
+    color: var(--text-secondary);
+    display: block;
+    margin-bottom: 8px;
+}
+
+.next-name {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--gold);
+}
+
+.skip-btn {
+    padding: 14px 40px;
+    background: var(--gray-dark);
+    border: 2px solid var(--gray-mid);
+    border-radius: 12px;
+    color: var(--white);
+    font-size: 17px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+/* ===== SCREEN HEADER ===== */
+.screen-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px;
+    background: var(--black);
+    border-bottom: 1px solid var(--gray-mid);
+}
+
+.screen-header h2 {
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.done-btn {
+    background: transparent;
+    border: none;
+    color: var(--gold);
+    font-size: 17px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+/* ===== HISTORY SCREEN ===== */
+.stats-row {
+    display: flex;
+    gap: 12px;
+    padding: 16px;
+}
+
+.stat-box {
+    flex: 1;
+    background: var(--gray-dark);
+    border-radius: 16px;
+    padding: 20px;
+    text-align: center;
+}
+
+.stat-title {
+    font-size: 14px;
+    color: var(--text-secondary);
+    display: block;
+    margin-bottom: 8px;
+}
+
+.stat-value {
+    font-size: 48px;
+    font-weight: 700;
+    color: var(--gold);
+    display: block;
+}
+
+.stat-subtitle {
+    font-size: 13px;
+    color: var(--text-secondary);
+}
+
+.history-list {
+    padding: 0 16px;
+    overflow-y: auto;
+    flex: 1;
+}
+
+.empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 20px;
+    color: var(--text-secondary);
+    text-align: center;
+}
+
+.empty-state svg {
+    opacity: 0.3;
+    margin-bottom: 16px;
+}
+
+.empty-state h3 {
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--white);
+    margin-bottom: 8px;
+}
+
+.empty-state p {
+    font-size: 15px;
+    color: var(--text-secondary);
+}
+
+.history-section {
+    margin-bottom: 24px;
+}
+
+.history-date {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    margin-bottom: 12px;
+}
+
+.history-entry {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 16px;
+    background: var(--gray-dark);
+    border-radius: 12px;
+    margin-bottom: 8px;
+}
+
+.history-left {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 6px;
+}
+
+.history-name {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--white);
+}
+
+.history-type {
+    font-size: 14px;
+    color: var(--text-secondary);
+}
+
+.history-time {
+    font-size: 13px;
+    color: var(--text-secondary);
+}
+
+.history-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.history-weight {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--gold);
+}
+
+.history-failure {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--green);
+    background: rgba(34, 197, 94, 0.15);
+    padding: 2px 8px;
+    border-radius: 6px;
+}
+
+/* ===== SETTINGS SCREEN ===== */
+.settings-content {
+    padding: 16px;
+    overflow-y: auto;
+}
+
+.settings-section {
+    margin-bottom: 32px;
+}
+
+.section-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    margin-bottom: 12px;
+}
+
+.settings-group {
+    background: var(--gray-dark);
+    border-radius: 16px;
+    padding: 16px;
+}
+
+.setting-label {
+    font-size: 14px;
+    color: var(--text-secondary);
+    margin-bottom: 10px;
+    display: block;
+}
+
+.setting-label:not(:first-child) {
+    margin-top: 16px;
+}
+
+/* ===== VOICE BUTTONS ===== */
+.voice-buttons {
+    display: flex;
+    gap: 12px;
+}
+
+.voice-btn {
+    width: 50px;
+    height: 50px;
+    border-radius: 12px;
+    border: 2px solid var(--gray-light);
+    background: var(--gray-mid);
+    color: var(--white);
+    font-size: 18px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.voice-btn.active {
+    border-color: var(--gold);
+    background: var(--gold);
+    color: var(--black);
+}
+
+.commander-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 14px 20px;
+    background: var(--gray-mid);
+    border: 2px solid var(--gray-light);
+    border-radius: 12px;
+    color: var(--white);
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.commander-btn.active {
+    border-color: var(--gold);
+    background: var(--gold);
+    color: var(--black);
+}
+
+.pro-badge {
+    font-size: 10px;
+    font-weight: 700;
+    background: var(--gold);
+    color: var(--black);
+    padding: 2px 6px;
+    border-radius: 4px;
+}
+
+.commander-btn.active .pro-badge {
+    background: var(--black);
+    color: var(--gold);
+}
+
+/* ===== PHASE SETTINGS ===== */
+.phase-setting {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--gray-mid);
+}
+
+.phase-setting:last-child {
+    border-bottom: none;
+}
+
+.phase-name {
+    font-size: 17px;
+    font-weight: 500;
+    color: var(--white);
+}
+
+.stepper {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: var(--gold);
+    font-size: 17px;
+    font-weight: 600;
+}
+
+.stepper button {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    border: none;
+    background: var(--gray-mid);
+    color: var(--gold);
+    font-size: 20px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+/* ===== ABOUT ===== */
+.about-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px;
+    background: var(--gray-dark);
+    border-radius: 12px;
+    font-size: 17px;
+}
+
+.about-value {
+    color: var(--text-secondary);
+}
+
+/* ===== TAB BAR ===== */
+.tab-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    background: var(--gray-dark);
+    border-top: 1px solid var(--gray-mid);
+    padding: 8px 0;
+    padding-bottom: calc(8px + env(safe-area-inset-bottom, 0));
+    z-index: 100;
+}
+
+.tab {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    font-size: 11px;
+    font-weight: 500;
+    cursor: pointer;
+    padding: 8px 0;
+}
+
+.tab.active {
+    color: var(--gold);
+}
+
+.tab svg {
+    width: 24px;
+    height: 24px;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (min-width: 768px) {
+    .app-container {
+        max-width: 420px;
+        margin: 0 auto;
+        border-left: 1px solid var(--gray-mid);
+        border-right: 1px solid var(--gray-mid);
+    }
+
+    .tab-bar {
+        max-width: 420px;
+        left: 50%;
+        transform: translateX(-50%);
+    }
+}
+
+/* ===== SAFE AREA ===== */
+@supports (padding-top: env(safe-area-inset-top)) {
+    .status-bar {
+        padding-top: calc(8px + env(safe-area-inset-top));
+    }
+
+    .app-container {
+        padding-bottom: calc(80px + env(safe-area-inset-bottom));
+    }
+}
+
+/* ===== ANIMATIONS ===== */
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+.timer-display.active {
+    animation: pulse 1s ease-in-out infinite;
+}
+
+/* ===== PRINT STYLES ===== */
+@media print {
+    .tab-bar,
+    .status-bar {
+        display: none;
+    }
+}
