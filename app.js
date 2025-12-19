@@ -1042,11 +1042,162 @@ function switchTab(tab) {
         showScreen('workoutListScreen');
     } else if (tab === 'stats') {
         document.getElementById('tabStats').classList.add('active');
-        showHistoryScreen();
+        showStatsScreen();
     } else if (tab === 'log') {
         document.getElementById('tabLog').classList.add('active');
-        showHistoryScreen();
+        showLogScreen();
     }
+}
+
+function showStatsScreen() {
+    showScreen('statsScreen');
+    updateStatsDisplay();
+}
+
+function showLogScreen() {
+    showScreen('logScreen');
+    updateLogDisplay();
+}
+
+function updateStatsDisplay() {
+    const history = JSON.parse(localStorage.getItem(`hitcoach_history_${state.currentProfile}`) || '[]');
+
+    // Calculate stats
+    const totalSets = history.length;
+    const uniqueDays = new Set(history.map(h => new Date(h.date).toDateString())).size;
+    const thisWeek = history.filter(h => {
+        const d = new Date(h.date);
+        const now = new Date();
+        const weekAgo = new Date(now - 7 * 24 * 60 * 60 * 1000);
+        return d > weekAgo;
+    }).length;
+
+    // Calculate streak
+    let streak = 0;
+    const today = new Date();
+    for (let i = 0; i < 30; i++) {
+        const checkDate = new Date(today - i * 24 * 60 * 60 * 1000).toDateString();
+        const hasWorkout = history.some(h => new Date(h.date).toDateString() === checkDate);
+        if (hasWorkout) streak++;
+        else if (i > 0) break;
+    }
+
+    // Update display
+    document.getElementById('statTotalWorkouts').textContent = uniqueDays;
+    document.getElementById('statTotalSets').textContent = totalSets;
+    document.getElementById('statCurrentStreak').textContent = streak;
+    document.getElementById('statThisWeek').textContent = thisWeek;
+
+    // Update weekly chart
+    updateWeeklyChart(history);
+
+    // Update personal records
+    updatePersonalRecords(history);
+}
+
+function updateWeeklyChart(history) {
+    const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    const today = new Date();
+    const chartBars = document.querySelectorAll('.chart-bar');
+
+    chartBars.forEach((bar, index) => {
+        const dayIndex = (today.getDay() - 6 + index + 7) % 7;
+        const checkDate = new Date(today);
+        checkDate.setDate(today.getDate() - (6 - index));
+
+        const dayWorkouts = history.filter(h =>
+            new Date(h.date).toDateString() === checkDate.toDateString()
+        ).length;
+
+        bar.classList.toggle('active', dayWorkouts > 0);
+        const fill = bar.querySelector('.bar-fill');
+        fill.style.height = dayWorkouts > 0 ? `${Math.min(dayWorkouts * 20, 80)}px` : '4px';
+    });
+}
+
+function updatePersonalRecords(history) {
+    const records = {};
+    history.forEach(h => {
+        if (!records[h.exerciseName] || h.weight > records[h.exerciseName]) {
+            records[h.exerciseName] = h.weight;
+        }
+    });
+
+    const container = document.getElementById('personalRecords');
+    if (Object.keys(records).length === 0) {
+        container.innerHTML = '<div class="empty-state small"><p>Complete workouts to see your PRs</p></div>';
+        return;
+    }
+
+    container.innerHTML = Object.entries(records)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 5)
+        .map(([name, weight]) => `
+            <div class="record-item">
+                <span class="record-name">${name}</span>
+                <span class="record-value">${weight} lbs</span>
+            </div>
+        `).join('');
+}
+
+function updateLogDisplay(filter = 'all') {
+    const history = JSON.parse(localStorage.getItem(`hitcoach_history_${state.currentProfile}`) || '[]');
+
+    let filtered = history;
+    const now = new Date();
+
+    if (filter === 'week') {
+        const weekAgo = new Date(now - 7 * 24 * 60 * 60 * 1000);
+        filtered = history.filter(h => new Date(h.date) > weekAgo);
+    } else if (filter === 'month') {
+        const monthAgo = new Date(now - 30 * 24 * 60 * 60 * 1000);
+        filtered = history.filter(h => new Date(h.date) > monthAgo);
+    }
+
+    const container = document.getElementById('logList');
+    const emptyLog = document.getElementById('emptyLog');
+
+    if (filtered.length === 0) {
+        emptyLog.style.display = 'block';
+        container.innerHTML = '';
+        container.appendChild(emptyLog);
+        return;
+    }
+
+    emptyLog.style.display = 'none';
+
+    // Group by date
+    const grouped = {};
+    filtered.forEach(h => {
+        const dateKey = new Date(h.date).toDateString();
+        if (!grouped[dateKey]) grouped[dateKey] = [];
+        grouped[dateKey].push(h);
+    });
+
+    container.innerHTML = Object.entries(grouped)
+        .sort((a, b) => new Date(b[0]) - new Date(a[0]))
+        .map(([date, exercises]) => `
+            <div class="log-entry">
+                <div class="log-entry-header">
+                    <span class="log-entry-date">${formatDate(new Date(date))}</span>
+                    <span class="log-entry-type">${exercises[0]?.workoutType || 'Workout'}</span>
+                </div>
+                <div class="log-entry-exercises">
+                    ${exercises.map(e => `<span class="log-exercise-tag">${e.exerciseName} - ${e.weight}lbs</span>`).join('')}
+                </div>
+            </div>
+        `).join('');
+}
+
+function filterLog(filter) {
+    document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+    event.target.classList.add('active');
+    updateLogDisplay(filter);
+}
+
+function formatDate(date) {
+    const options = { weekday: 'short', month: 'short', day: 'numeric' };
+    return date.toLocaleDateString('en-US', options);
 }
 
 // ===== PERSISTENCE =====

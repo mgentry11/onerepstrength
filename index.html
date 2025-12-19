@@ -362,6 +362,87 @@
             </div>
         </div>
 
+        <!-- ========== STATS SCREEN ========== -->
+        <div class="screen" id="statsScreen">
+            <header class="screen-header">
+                <div style="width: 24px;"></div>
+                <h2>Statistics</h2>
+                <div style="width: 24px;"></div>
+            </header>
+
+            <!-- Stats Overview Cards -->
+            <div class="stats-overview">
+                <div class="stats-card purple">
+                    <div class="stats-card-value" id="statTotalWorkouts">0</div>
+                    <div class="stats-card-label">Total Workouts</div>
+                </div>
+                <div class="stats-card blue">
+                    <div class="stats-card-value" id="statTotalSets">0</div>
+                    <div class="stats-card-label">Sets Completed</div>
+                </div>
+                <div class="stats-card green">
+                    <div class="stats-card-value" id="statCurrentStreak">0</div>
+                    <div class="stats-card-label">Day Streak</div>
+                </div>
+                <div class="stats-card orange">
+                    <div class="stats-card-value" id="statThisWeek">0</div>
+                    <div class="stats-card-label">This Week</div>
+                </div>
+            </div>
+
+            <!-- Weekly Chart -->
+            <div class="stats-section">
+                <h3 class="section-title">Weekly Activity</h3>
+                <div class="weekly-chart" id="weeklyChart">
+                    <div class="chart-bar" data-day="Mon"><div class="bar-fill"></div><span>M</span></div>
+                    <div class="chart-bar" data-day="Tue"><div class="bar-fill"></div><span>T</span></div>
+                    <div class="chart-bar" data-day="Wed"><div class="bar-fill"></div><span>W</span></div>
+                    <div class="chart-bar" data-day="Thu"><div class="bar-fill"></div><span>T</span></div>
+                    <div class="chart-bar" data-day="Fri"><div class="bar-fill"></div><span>F</span></div>
+                    <div class="chart-bar" data-day="Sat"><div class="bar-fill"></div><span>S</span></div>
+                    <div class="chart-bar" data-day="Sun"><div class="bar-fill"></div><span>S</span></div>
+                </div>
+            </div>
+
+            <!-- Personal Records -->
+            <div class="stats-section">
+                <h3 class="section-title">Personal Records</h3>
+                <div class="records-list" id="personalRecords">
+                    <div class="empty-state small">
+                        <p>Complete workouts to see your PRs</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========== LOG SCREEN ========== -->
+        <div class="screen" id="logScreen">
+            <header class="screen-header">
+                <div style="width: 24px;"></div>
+                <h2>Workout Log</h2>
+                <div style="width: 24px;"></div>
+            </header>
+
+            <!-- Filter Tabs -->
+            <div class="log-filters">
+                <button class="filter-btn active" onclick="filterLog('all')">All</button>
+                <button class="filter-btn" onclick="filterLog('week')">This Week</button>
+                <button class="filter-btn" onclick="filterLog('month')">This Month</button>
+            </div>
+
+            <!-- Log Entries -->
+            <div class="log-list" id="logList">
+                <div class="empty-state" id="emptyLog">
+                    <svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor" stroke-width="1">
+                        <rect x="3" y="4" width="18" height="16" rx="2"/>
+                        <path d="M7 8h4M7 12h10M7 16h6"/>
+                    </svg>
+                    <h3>No Workouts Logged</h3>
+                    <p>Start a workout to begin tracking</p>
+                </div>
+            </div>
+        </div>
+
         <!-- ========== SETTINGS SCREEN ========== -->
         <div class="screen" id="settingsScreen">
             <header class="screen-header">

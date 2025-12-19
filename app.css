@@ -1370,3 +1370,212 @@ body {
         display: none;
     }
 }
+
+/* ===== STATS SCREEN ===== */
+.stats-overview {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    padding: 16px;
+}
+
+.stats-card {
+    background: var(--card);
+    border-radius: 16px;
+    padding: 20px;
+    text-align: center;
+    border: 1px solid var(--border);
+}
+
+.stats-card.purple { border-left: 4px solid var(--purple); }
+.stats-card.blue { border-left: 4px solid var(--primary); }
+.stats-card.green { border-left: 4px solid var(--green); }
+.stats-card.orange { border-left: 4px solid var(--orange); }
+
+.stats-card-value {
+    font-size: 32px;
+    font-weight: 800;
+    color: var(--text);
+    line-height: 1;
+}
+
+.stats-card.purple .stats-card-value { color: var(--purple); }
+.stats-card.blue .stats-card-value { color: var(--primary); }
+.stats-card.green .stats-card-value { color: var(--green); }
+.stats-card.orange .stats-card-value { color: var(--orange); }
+
+.stats-card-label {
+    font-size: 13px;
+    color: var(--text-secondary);
+    margin-top: 8px;
+}
+
+.stats-section {
+    padding: 16px;
+}
+
+.stats-section .section-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 12px;
+}
+
+/* Weekly Chart */
+.weekly-chart {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    height: 120px;
+    background: var(--card);
+    border-radius: 12px;
+    padding: 16px;
+    border: 1px solid var(--border);
+}
+
+.chart-bar {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 1;
+    height: 100%;
+}
+
+.chart-bar .bar-fill {
+    width: 24px;
+    background: var(--primary);
+    border-radius: 4px 4px 0 0;
+    flex-grow: 1;
+    min-height: 4px;
+    max-height: 80px;
+    opacity: 0.3;
+    transition: all 0.3s;
+}
+
+.chart-bar.active .bar-fill {
+    opacity: 1;
+    background: linear-gradient(180deg, var(--purple) 0%, var(--primary) 100%);
+}
+
+.chart-bar span {
+    font-size: 12px;
+    color: var(--text-secondary);
+    margin-top: 8px;
+    font-weight: 500;
+}
+
+/* Records List */
+.records-list {
+    background: var(--card);
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    overflow: hidden;
+}
+
+.record-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--border);
+}
+
+.record-item:last-child {
+    border-bottom: none;
+}
+
+.record-name {
+    font-weight: 600;
+    color: var(--text);
+}
+
+.record-value {
+    font-weight: 700;
+    color: var(--purple);
+}
+
+/* ===== LOG SCREEN ===== */
+.log-filters {
+    display: flex;
+    gap: 8px;
+    padding: 12px 16px;
+    background: var(--bg-alt);
+}
+
+.filter-btn {
+    padding: 8px 16px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.filter-btn.active {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: white;
+}
+
+.log-list {
+    padding: 16px;
+}
+
+.log-entry {
+    background: var(--card);
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 12px;
+    border: 1px solid var(--border);
+}
+
+.log-entry-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.log-entry-date {
+    font-weight: 600;
+    color: var(--text);
+}
+
+.log-entry-type {
+    font-size: 12px;
+    padding: 4px 10px;
+    background: var(--purple);
+    color: white;
+    border-radius: 12px;
+    font-weight: 500;
+}
+
+.log-entry-exercises {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.log-exercise-tag {
+    font-size: 13px;
+    padding: 4px 10px;
+    background: var(--bg-alt);
+    color: var(--text-secondary);
+    border-radius: 8px;
+}
+
+.empty-state.small {
+    padding: 24px;
+    text-align: center;
+}
+
+.empty-state.small p {
+    color: var(--text-secondary);
+    font-size: 14px;
+    margin: 0;
+}
