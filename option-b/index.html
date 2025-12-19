@@ -1,0 +1,1370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>One Rep Strength | Build Muscle with One Focused Rep</title>
+
+    <!-- SEO -->
+    <meta name="description" content="Build strength with ONE slow, focused rep per exercise. The 30-20-40 protocol provides 90 seconds of continuous muscle tension. Safe strength training for adults over 50.">
+    <meta name="keywords" content="one rep training, slow lifting, negative training, eccentric training, strength training over 50">
+
+    <!-- PWA -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#0369a1">
+    <link rel="manifest" href="manifest.json">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Libre+Franklin:wght@300;400;600;700;800&family=Merriweather:wght@400;700&display=swap" rel="stylesheet">
+
+    <!-- Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <style>
+        :root {
+            --color-bg: #fafaf9;
+            --color-bg-alt: #f5f5f4;
+            --color-bg-dark: #1c1917;
+            --color-card: #ffffff;
+            --color-primary: #0369a1;
+            --color-accent: #059669;
+            --color-accent-light: #d1fae5;
+            --color-purple: #7c3aed;
+            --color-down: #3b82f6;
+            --color-up: #22c55e;
+            --color-text: #1c1917;
+            --color-text-light: #57534e;
+            --color-border: #e7e5e4;
+            --color-danger: #ef4444;
+            --font-heading: 'Libre Franklin', sans-serif;
+            --font-body: 'Merriweather', Georgia, serif;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: var(--font-body);
+            background: var(--color-bg);
+            color: var(--color-text);
+            line-height: 1.8;
+            font-size: 18px;
+        }
+
+        /* Navigation */
+        nav {
+            background: white;
+            border-bottom: 1px solid var(--color-border);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+        }
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .logo {
+            font-family: var(--font-heading);
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: var(--color-text);
+            text-decoration: none;
+        }
+        .logo span { color: var(--color-primary); }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+            align-items: center;
+        }
+        .nav-links a {
+            color: var(--color-text);
+            text-decoration: none;
+            font-family: var(--font-heading);
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: color 0.2s;
+        }
+        .nav-links a:hover { color: var(--color-primary); }
+        .nav-app-link {
+            background: var(--color-accent) !important;
+            color: white !important;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+        }
+        .nav-app-link:hover { background: #047857 !important; }
+
+        .mobile-toggle {
+            display: none;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0.5rem;
+        }
+        .mobile-toggle span {
+            display: block;
+            width: 24px;
+            height: 2px;
+            background: var(--color-text);
+            margin: 5px 0;
+        }
+
+        /* Hero */
+        .hero {
+            background: linear-gradient(135deg, var(--color-bg-dark) 0%, #292524 100%);
+            color: white;
+            padding: 8rem 2rem 5rem;
+            text-align: center;
+        }
+        .hero h1 {
+            font-family: var(--font-heading);
+            font-size: clamp(2.5rem, 5vw, 4rem);
+            font-weight: 800;
+            line-height: 1.1;
+            margin-bottom: 1.5rem;
+        }
+        .hero h1 span { color: var(--color-primary); }
+        .hero p {
+            font-size: 1.25rem;
+            opacity: 0.9;
+            max-width: 700px;
+            margin: 0 auto 2rem;
+        }
+
+        .cta-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .btn {
+            font-family: var(--font-heading);
+            font-weight: 700;
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            text-decoration: none;
+            transition: all 0.2s;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+        .btn-primary {
+            background: var(--color-accent);
+            color: white;
+        }
+        .btn-primary:hover { background: #047857; }
+        .btn-secondary {
+            background: transparent;
+            color: white;
+            border: 2px solid rgba(255,255,255,0.5);
+        }
+        .btn-secondary:hover { border-color: white; }
+
+        /* Protocol Display */
+        .protocol-hero {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin: 2rem 0;
+            flex-wrap: wrap;
+        }
+        .protocol-phase {
+            text-align: center;
+            padding: 1rem 1.5rem;
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+        }
+        .protocol-phase .time {
+            font-family: var(--font-heading);
+            font-size: 2.5rem;
+            font-weight: 800;
+        }
+        .protocol-phase.down .time { color: var(--color-down); }
+        .protocol-phase.up .time { color: var(--color-up); }
+        .protocol-phase .label {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            opacity: 0.8;
+        }
+
+        /* Content Sections */
+        .section {
+            padding: 5rem 2rem;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        .section-alt {
+            background: var(--color-bg-alt);
+        }
+        .section h2 {
+            font-family: var(--font-heading);
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+            color: var(--color-text);
+        }
+        .section p {
+            margin-bottom: 1.5rem;
+            color: var(--color-text-light);
+        }
+
+        /* Method Cards */
+        .method-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+        .method-card {
+            background: white;
+            border: 1px solid var(--color-border);
+            border-radius: 12px;
+            padding: 1.5rem;
+        }
+        .method-card h3 {
+            font-family: var(--font-heading);
+            font-size: 1.25rem;
+            margin-bottom: 0.75rem;
+            color: var(--color-primary);
+        }
+
+        /* App Section */
+        .app-section {
+            background: linear-gradient(135deg, var(--color-bg-dark) 0%, #292524 100%);
+            padding: 3rem 0;
+        }
+        .app-container {
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+        .app-frame {
+            background: var(--color-bg-dark);
+            border-radius: 30px;
+            border: 4px solid #44403c;
+            overflow: hidden;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+        }
+        .app-notch {
+            height: 24px;
+            background: var(--color-bg-dark);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .app-notch::after {
+            content: '';
+            width: 80px;
+            height: 6px;
+            background: #44403c;
+            border-radius: 3px;
+        }
+
+        /* App Internal Styles */
+        .app-inner {
+            background: var(--color-bg-dark);
+            color: #fafaf9;
+            font-family: var(--font-heading);
+            min-height: 600px;
+        }
+
+        .app-header {
+            background: #292524;
+            border-bottom: 1px solid #44403c;
+            padding: 0.75rem 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .app-logo {
+            font-size: 1rem;
+            font-weight: 800;
+            color: #fafaf9;
+        }
+        .app-logo span { color: var(--color-primary); }
+
+        .app-tabs {
+            display: flex;
+            background: #292524;
+            border-bottom: 1px solid #44403c;
+            overflow-x: auto;
+        }
+        .app-tab {
+            flex: 1;
+            padding: 0.75rem 0.5rem;
+            background: none;
+            border: none;
+            color: #a8a29e;
+            font-family: var(--font-heading);
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+        .app-tab:hover { color: #fafaf9; }
+        .app-tab.active {
+            color: var(--color-primary);
+            border-bottom-color: var(--color-primary);
+        }
+
+        .app-content {
+            padding: 1rem;
+            display: none;
+        }
+        .app-content.active { display: block; }
+
+        .workout-select {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        .workout-select-btn {
+            flex: 1;
+            padding: 0.75rem;
+            background: #292524;
+            border: 2px solid #44403c;
+            border-radius: 10px;
+            color: #fafaf9;
+            font-family: var(--font-heading);
+            font-weight: 700;
+            cursor: pointer;
+        }
+        .workout-select-btn.active {
+            border-color: var(--color-primary);
+            background: rgba(14, 165, 233, 0.1);
+        }
+
+        .progress-indicator {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            padding: 0.5rem 0.75rem;
+            background: #292524;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            color: #a8a29e;
+        }
+        .progress-indicator strong { color: var(--color-accent); }
+
+        .exercise-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem;
+            background: #292524;
+            border: 1px solid #44403c;
+            border-radius: 10px;
+            margin-bottom: 0.5rem;
+            cursor: pointer;
+            transition: border-color 0.2s;
+        }
+        .exercise-item:hover { border-color: var(--color-primary); }
+        .exercise-item.completed {
+            border-color: var(--color-accent);
+            background: rgba(5, 150, 105, 0.1);
+        }
+        .exercise-num {
+            width: 28px;
+            height: 28px;
+            background: var(--color-primary);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.8rem;
+            flex-shrink: 0;
+        }
+        .exercise-item.completed .exercise-num { background: var(--color-accent); }
+        .exercise-name {
+            flex: 1;
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+        .exercise-start {
+            padding: 0.4rem 0.75rem;
+            background: var(--color-primary);
+            border: none;
+            border-radius: 6px;
+            color: white;
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+        .stat-card {
+            background: #292524;
+            border: 1px solid #44403c;
+            border-radius: 10px;
+            padding: 1rem;
+            text-align: center;
+        }
+        .stat-value {
+            font-size: 1.75rem;
+            font-weight: 800;
+            color: var(--color-primary);
+            line-height: 1;
+        }
+        .stat-card.purple .stat-value { color: var(--color-purple); }
+        .stat-card.green .stat-value { color: var(--color-accent); }
+        .stat-label {
+            font-size: 0.8rem;
+            color: #a8a29e;
+            margin-top: 0.25rem;
+        }
+
+        /* Settings */
+        .setting-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem;
+            background: #292524;
+            border: 1px solid #44403c;
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+        }
+        .setting-label {
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        .setting-row select, .setting-row input {
+            padding: 0.4rem;
+            background: var(--color-bg-dark);
+            border: 1px solid #44403c;
+            border-radius: 4px;
+            color: #fafaf9;
+            font-family: var(--font-heading);
+        }
+        .section-label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #a8a29e;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin: 1rem 0 0.5rem;
+        }
+
+        .sync-banner {
+            background: linear-gradient(135deg, var(--color-purple), var(--color-primary));
+            padding: 0.75rem;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+        .sync-banner p {
+            font-size: 0.85rem;
+            margin-bottom: 0.5rem;
+            color: white;
+        }
+        .sync-banner .btn {
+            padding: 0.5rem 1rem;
+            font-size: 0.85rem;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 2rem 1rem;
+            color: #a8a29e;
+        }
+        .empty-state h3 {
+            color: #fafaf9;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Timer Modal */
+        .timer-modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: var(--color-bg-dark);
+            z-index: 2000;
+            flex-direction: column;
+        }
+        .timer-modal.active { display: flex; }
+
+        .timer-header {
+            padding: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #44403c;
+        }
+        .timer-close {
+            background: none;
+            border: none;
+            color: var(--color-primary);
+            font-family: var(--font-heading);
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .timer-exercise-name {
+            font-family: var(--font-heading);
+            font-weight: 700;
+            color: #fafaf9;
+        }
+
+        .timer-body {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+        .timer-phase {
+            font-family: var(--font-heading);
+            font-size: 1.5rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 1rem;
+        }
+        .timer-phase.down { color: var(--color-down); }
+        .timer-phase.up { color: var(--color-up); }
+
+        .timer-display {
+            font-family: var(--font-heading);
+            font-size: 8rem;
+            font-weight: 800;
+            line-height: 1;
+            font-variant-numeric: tabular-nums;
+            margin-bottom: 2rem;
+            color: #fafaf9;
+        }
+        .timer-display.down { color: var(--color-down); }
+        .timer-display.up { color: var(--color-up); }
+
+        .timer-progress {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+        }
+        .phase-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #44403c;
+        }
+        .phase-dot.active { background: var(--color-primary); }
+        .phase-dot.down.active { background: var(--color-down); }
+        .phase-dot.up.active { background: var(--color-up); }
+
+        .timer-controls {
+            display: flex;
+            gap: 1rem;
+        }
+        .timer-btn {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            border: none;
+            background: #292524;
+            color: #fafaf9;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+        .timer-btn.primary {
+            width: 80px;
+            height: 80px;
+            background: var(--color-primary);
+        }
+
+        /* Auth Modal */
+        .auth-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.8);
+            z-index: 3000;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+        .auth-overlay.active { display: flex; }
+        .auth-card {
+            background: #292524;
+            border-radius: 16px;
+            padding: 2rem;
+            width: 100%;
+            max-width: 400px;
+        }
+        .auth-title {
+            font-family: var(--font-heading);
+            text-align: center;
+            font-size: 1.5rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+            color: #fafaf9;
+        }
+        .auth-subtitle {
+            text-align: center;
+            color: #a8a29e;
+            margin-bottom: 1.5rem;
+        }
+        .auth-input {
+            width: 100%;
+            padding: 1rem;
+            background: var(--color-bg-dark);
+            border: 1px solid #44403c;
+            border-radius: 10px;
+            color: #fafaf9;
+            font-size: 1rem;
+            margin-bottom: 1rem;
+        }
+        .auth-input:focus {
+            outline: none;
+            border-color: var(--color-primary);
+        }
+        .auth-btn {
+            width: 100%;
+            padding: 1rem;
+            background: var(--color-accent);
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-family: var(--font-heading);
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            margin-bottom: 1rem;
+        }
+        .auth-skip {
+            width: 100%;
+            padding: 0.75rem;
+            background: none;
+            border: 1px solid #44403c;
+            border-radius: 10px;
+            color: #a8a29e;
+            cursor: pointer;
+        }
+        .auth-toggle {
+            text-align: center;
+            margin-top: 1rem;
+            color: #a8a29e;
+        }
+        .auth-toggle a {
+            color: var(--color-primary);
+            cursor: pointer;
+        }
+
+        /* Log Entry */
+        .log-entry {
+            background: #292524;
+            border: 1px solid #44403c;
+            border-radius: 10px;
+            padding: 0.75rem;
+            margin-bottom: 0.5rem;
+        }
+        .log-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+        }
+        .log-date {
+            font-weight: 700;
+            font-size: 0.9rem;
+        }
+        .log-type {
+            font-size: 0.75rem;
+            padding: 0.2rem 0.5rem;
+            background: var(--color-purple);
+            border-radius: 10px;
+        }
+        .log-exercises {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.4rem;
+        }
+        .log-tag {
+            font-size: 0.8rem;
+            padding: 0.2rem 0.5rem;
+            background: var(--color-bg-dark);
+            border-radius: 4px;
+            color: #a8a29e;
+        }
+
+        /* Footer */
+        footer {
+            background: var(--color-bg-dark);
+            color: rgba(255,255,255,0.6);
+            text-align: center;
+            padding: 2rem;
+            font-size: 0.9rem;
+        }
+
+        /* Install Banner */
+        .install-banner {
+            display: none;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--color-primary);
+            color: white;
+            padding: 1rem;
+            text-align: center;
+            z-index: 500;
+        }
+        .install-banner.show { display: block; }
+        .install-banner button {
+            margin-left: 1rem;
+            padding: 0.5rem 1rem;
+            background: white;
+            color: var(--color-primary);
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .mobile-toggle { display: block; }
+            .nav-links {
+                display: none;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background: white;
+                flex-direction: column;
+                padding: 1rem 2rem;
+                gap: 1rem;
+                border-bottom: 1px solid var(--color-border);
+            }
+            .nav-links.active { display: flex; }
+            .hero { padding: 7rem 1.5rem 4rem; }
+            .section { padding: 3rem 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav>
+        <div class="nav-container">
+            <a href="#" class="logo">One Rep <span>Strength</span></a>
+            <button class="mobile-toggle" onclick="toggleNav()">
+                <span></span><span></span><span></span>
+            </button>
+            <ul class="nav-links" id="navLinks">
+                <li><a href="#method">The Method</a></li>
+                <li><a href="#science">The Science</a></li>
+                <li><a href="#workout">Workout</a></li>
+                <li><a href="#app" class="nav-app-link">Start Training</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Hero -->
+    <section class="hero">
+        <h1>Build Strength with <span>One Rep</span></h1>
+        <p>90 seconds of continuous muscle tension. One focused rep per exercise. The safest, most efficient way to build strength after 50.</p>
+
+        <div class="protocol-hero">
+            <div class="protocol-phase down">
+                <div class="time">30</div>
+                <div class="label">Lower</div>
+            </div>
+            <div class="protocol-phase up">
+                <div class="time">20</div>
+                <div class="label">Lift</div>
+            </div>
+            <div class="protocol-phase down">
+                <div class="time">40</div>
+                <div class="label">Lower</div>
+            </div>
+        </div>
+
+        <div class="cta-buttons">
+            <a href="#app" class="btn btn-primary">Start Training</a>
+            <a href="#method" class="btn btn-secondary">Learn More</a>
+        </div>
+    </section>
+
+    <!-- Method Section -->
+    <section class="section" id="method">
+        <h2>The 30-20-40 Protocol</h2>
+        <p>One rep. 90 seconds. Maximum results. The protocol focuses on time under tension rather than counting reps. Research shows 60-90 seconds of continuous muscle tension stimulates optimal muscle growth.</p>
+
+        <div class="method-grid">
+            <div class="method-card">
+                <h3>Lower for 30</h3>
+                <p>Begin with a controlled 30-second eccentric phase. Your muscles can handle 40% more load when lowering.</p>
+            </div>
+            <div class="method-card">
+                <h3>Lift for 20</h3>
+                <p>Raise the weight slowly for 20 seconds. No momentum, no jerking. Pure muscle contraction.</p>
+            </div>
+            <div class="method-card">
+                <h3>Lower for 40</h3>
+                <p>The final 40-second negative is where the magic happens. Deep muscle fatigue triggers growth.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Science Section -->
+    <section class="section section-alt" id="science">
+        <h2>Why It Works</h2>
+        <p>Negative-accentuated training emphasizes the eccentric (lowering) phase of exercises. Your muscles can handle approximately 40% more load when lowering than when lifting, and research shows eccentric training produces up to 50% greater strength gains.</p>
+        <p>The 30-20-40 protocol dedicates 70 of its 90 seconds to negative phases. This isn't arbitrary - it's based on decades of research from exercise scientists and practical application by trainers like Dr. Ellington Darden.</p>
+        <p>For adults over 50, this approach is ideal: maximum muscle stimulation with minimal joint stress. No heavy weights bouncing around. No momentum. Just controlled, focused movement that builds real strength safely.</p>
+    </section>
+
+    <!-- Workout Section -->
+    <section class="section" id="workout">
+        <h2>The Workouts</h2>
+        <p>Two alternating workouts, each targeting all major muscle groups. Train 2-3 times per week, alternating between Workout A and Workout B.</p>
+
+        <div class="method-grid">
+            <div class="method-card">
+                <h3>Workout A</h3>
+                <p>Leg Press, Leg Curl, Leg Extension, Chest Press, Seated Row, Shoulder Press, Lat Pulldown, Bicep Curl</p>
+            </div>
+            <div class="method-card">
+                <h3>Workout B</h3>
+                <p>Leg Press, Leg Curl, Calf Raise, Chest Fly, Lat Pulldown, Lateral Raise, Tricep Extension, Ab Crunch</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- App Section -->
+    <section class="app-section" id="app">
+        <div class="app-container">
+            <div class="app-frame">
+                <div class="app-notch"></div>
+                <div class="app-inner">
+                    <div class="app-header">
+                        <div class="app-logo">One Rep <span>Strength</span></div>
+                        <button class="timer-close" onclick="showAuth()" style="font-size: 0.85rem;">Sign In</button>
+                    </div>
+
+                    <div class="app-tabs">
+                        <button class="app-tab active" onclick="switchAppTab('workouts')">Workouts</button>
+                        <button class="app-tab" onclick="switchAppTab('stats')">Stats</button>
+                        <button class="app-tab" onclick="switchAppTab('log')">Log</button>
+                        <button class="app-tab" onclick="switchAppTab('settings')">Settings</button>
+                    </div>
+
+                    <!-- Workouts Tab -->
+                    <div class="app-content active" id="workoutsContent">
+                        <div class="workout-select">
+                            <button class="workout-select-btn active" onclick="selectWorkout('A')">Workout A</button>
+                            <button class="workout-select-btn" onclick="selectWorkout('B')">Workout B</button>
+                        </div>
+
+                        <div class="progress-indicator">
+                            <strong id="progressCount">0/8</strong> exercises completed
+                        </div>
+
+                        <div id="exerciseList"></div>
+                    </div>
+
+                    <!-- Stats Tab -->
+                    <div class="app-content" id="statsContent">
+                        <div class="stats-grid">
+                            <div class="stat-card">
+                                <div class="stat-value" id="statWorkouts">0</div>
+                                <div class="stat-label">Workouts</div>
+                            </div>
+                            <div class="stat-card purple">
+                                <div class="stat-value" id="statSets">0</div>
+                                <div class="stat-label">Sets</div>
+                            </div>
+                            <div class="stat-card green">
+                                <div class="stat-value" id="statStreak">0</div>
+                                <div class="stat-label">Day Streak</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-value" id="statWeek">0</div>
+                                <div class="stat-label">This Week</div>
+                            </div>
+                        </div>
+                        <div class="section-label">Personal Records</div>
+                        <div class="empty-state">
+                            <p>Complete workouts to see your PRs</p>
+                        </div>
+                    </div>
+
+                    <!-- Log Tab -->
+                    <div class="app-content" id="logContent">
+                        <div id="logList">
+                            <div class="empty-state">
+                                <h3>No Workouts Yet</h3>
+                                <p>Start a workout to begin tracking</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Settings Tab -->
+                    <div class="app-content" id="settingsContent">
+                        <div class="sync-banner" id="syncBanner">
+                            <p>Sign in to sync across devices</p>
+                            <button class="btn btn-primary" onclick="showAuth()">Sign In</button>
+                        </div>
+
+                        <div class="section-label">Voice</div>
+                        <div class="setting-row">
+                            <span class="setting-label">Voice Gender</span>
+                            <select id="voiceGender" onchange="saveSetting('voiceGender', this.value)">
+                                <option value="male">Male</option>
+                                <option value="female">Female</option>
+                            </select>
+                        </div>
+                        <div class="setting-row">
+                            <span class="setting-label">Coaching Mode</span>
+                            <select id="coachingMode" onchange="saveSetting('coachingMode', this.value)">
+                                <option value="phaseOnly">Phase Only</option>
+                                <option value="countdown">10s Countdown</option>
+                                <option value="full">Full Countdown</option>
+                            </select>
+                        </div>
+
+                        <div class="section-label">Phase Durations</div>
+                        <div class="setting-row">
+                            <span class="setting-label">Eccentric (Lower)</span>
+                            <input type="number" id="eccentricDuration" value="30" min="10" max="60" onchange="saveSetting('eccentricDuration', this.value)">
+                        </div>
+                        <div class="setting-row">
+                            <span class="setting-label">Concentric (Lift)</span>
+                            <input type="number" id="concentricDuration" value="20" min="10" max="60" onchange="saveSetting('concentricDuration', this.value)">
+                        </div>
+                        <div class="setting-row">
+                            <span class="setting-label">Final Eccentric</span>
+                            <input type="number" id="finalEccentricDuration" value="40" min="10" max="90" onchange="saveSetting('finalEccentricDuration', this.value)">
+                        </div>
+
+                        <div class="section-label">Account</div>
+                        <div class="setting-row">
+                            <span class="setting-label">Signed in as</span>
+                            <span style="color: #a8a29e; font-size: 0.9rem;" id="userEmail">Guest</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <p>The information on this site is for educational purposes only. Always consult your physician before beginning any exercise program.</p>
+    </footer>
+
+    <!-- Timer Modal -->
+    <div class="timer-modal" id="timerModal">
+        <div class="timer-header">
+            <button class="timer-close" onclick="closeTimer()">Cancel</button>
+            <span class="timer-exercise-name" id="timerExerciseName">Leg Press</span>
+            <button class="timer-close" onclick="skipPhase()">Skip</button>
+        </div>
+        <div class="timer-body">
+            <div class="timer-phase down" id="timerPhase">LOWER</div>
+            <div class="timer-display down" id="timerDisplay">30</div>
+            <div class="timer-progress">
+                <div class="phase-dot down active"></div>
+                <div class="phase-dot up"></div>
+                <div class="phase-dot down"></div>
+            </div>
+            <div class="timer-controls">
+                <button class="timer-btn" onclick="restartPhase()">↺</button>
+                <button class="timer-btn primary" onclick="toggleTimer()" id="timerPlayBtn">▶</button>
+                <button class="timer-btn" onclick="completeExercise()">✓</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Auth Modal -->
+    <div class="auth-overlay" id="authOverlay">
+        <div class="auth-card">
+            <h2 class="auth-title">One Rep <span style="color: var(--color-primary)">Strength</span></h2>
+            <p class="auth-subtitle">Sign in to sync across devices</p>
+            <input type="email" class="auth-input" id="authEmail" placeholder="Email">
+            <input type="password" class="auth-input" id="authPassword" placeholder="Password">
+            <button class="auth-btn" onclick="handleAuth()">Sign In</button>
+            <button class="auth-skip" onclick="skipAuth()">Continue as Guest</button>
+            <p class="auth-toggle">Don't have an account? <a onclick="toggleAuthMode()">Sign Up</a></p>
+        </div>
+    </div>
+
+    <!-- Install Banner -->
+    <div class="install-banner" id="installBanner">
+        Add to home screen for the full app experience
+        <button onclick="hideInstallBanner()">Dismiss</button>
+    </div>
+
+    <script>
+        // Supabase Config
+        const SUPABASE_URL = 'https://xmiwutflnqwcvdztgnwm.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhtaXd1dGZsbnF3Y3ZkenRnbndtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjYwOTgwNDMsImV4cCI6MjA4MTY3NDA0M30.EZN99LIMDnveKkDW2Xi5icOfnaAMeT95gRLOWcVuzrc';
+        let supabaseClient = null;
+        let currentUser = null;
+        let isSignUp = false;
+
+        // Workout Data
+        const WORKOUTS = {
+            A: ['Leg Press', 'Leg Curl', 'Leg Extension', 'Chest Press', 'Seated Row', 'Shoulder Press', 'Lat Pulldown', 'Bicep Curl'],
+            B: ['Leg Press', 'Leg Curl', 'Calf Raise', 'Chest Fly', 'Lat Pulldown', 'Lateral Raise', 'Tricep Extension', 'Ab Crunch']
+        };
+
+        let state = {
+            currentWorkout: 'A',
+            completedExercises: [],
+            settings: {
+                voiceGender: 'male',
+                coachingMode: 'phaseOnly',
+                eccentricDuration: 30,
+                concentricDuration: 20,
+                finalEccentricDuration: 40,
+                restDuration: 90
+            }
+        };
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            initSupabase();
+            loadState();
+            renderExercises();
+            updateStats();
+            checkInstallBanner();
+        });
+
+        function initSupabase() {
+            if (window.supabase) {
+                supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+                checkAuth();
+            }
+        }
+
+        async function checkAuth() {
+            const { data: { session } } = await supabaseClient.auth.getSession();
+            if (session) {
+                currentUser = session.user;
+                updateAuthUI();
+            }
+        }
+
+        function updateAuthUI() {
+            const syncBanner = document.getElementById('syncBanner');
+            const userEmail = document.getElementById('userEmail');
+            if (currentUser) {
+                syncBanner.style.display = 'none';
+                userEmail.textContent = currentUser.email;
+            } else {
+                syncBanner.style.display = 'block';
+                userEmail.textContent = 'Guest';
+            }
+        }
+
+        // Navigation
+        function toggleNav() {
+            document.getElementById('navLinks').classList.toggle('active');
+        }
+
+        // App Tab Switching
+        function switchAppTab(tab) {
+            document.querySelectorAll('.app-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.app-content').forEach(c => c.classList.remove('active'));
+            event.target.classList.add('active');
+            document.getElementById(tab + 'Content').classList.add('active');
+            if (tab === 'stats') updateStats();
+            if (tab === 'log') updateLog();
+        }
+
+        // Workout Functions
+        function selectWorkout(type) {
+            state.currentWorkout = type;
+            document.querySelectorAll('.workout-select-btn').forEach(b => b.classList.remove('active'));
+            event.target.classList.add('active');
+            renderExercises();
+        }
+
+        function renderExercises() {
+            const list = document.getElementById('exerciseList');
+            const exercises = WORKOUTS[state.currentWorkout];
+            list.innerHTML = exercises.map((name, i) => {
+                const completed = state.completedExercises.includes(name);
+                return `
+                    <div class="exercise-item ${completed ? 'completed' : ''}" onclick="startExercise('${name}')">
+                        <div class="exercise-num">${i + 1}</div>
+                        <div class="exercise-name">${name}</div>
+                        <button class="exercise-start">Start</button>
+                    </div>
+                `;
+            }).join('');
+            document.getElementById('progressCount').textContent = `${state.completedExercises.length}/${exercises.length}`;
+        }
+
+        function startExercise(name) {
+            document.getElementById('timerExerciseName').textContent = name;
+            document.getElementById('timerModal').classList.add('active');
+            resetTimer();
+        }
+
+        function closeTimer() {
+            clearInterval(timerInterval);
+            isRunning = false;
+            document.getElementById('timerModal').classList.remove('active');
+        }
+
+        // Timer
+        let timerInterval = null;
+        let timerSeconds = 30;
+        let timerPhase = 0;
+        let isRunning = false;
+
+        function resetTimer() {
+            timerPhase = 0;
+            timerSeconds = state.settings.eccentricDuration;
+            isRunning = false;
+            document.getElementById('timerPlayBtn').textContent = '▶';
+            updateTimerDisplay();
+        }
+
+        function updateTimerDisplay() {
+            const phases = ['LOWER', 'LIFT', 'LOWER'];
+            const colors = ['down', 'up', 'down'];
+            document.getElementById('timerPhase').textContent = phases[timerPhase];
+            document.getElementById('timerPhase').className = 'timer-phase ' + colors[timerPhase];
+            document.getElementById('timerDisplay').textContent = timerSeconds;
+            document.getElementById('timerDisplay').className = 'timer-display ' + colors[timerPhase];
+            document.querySelectorAll('.phase-dot').forEach((dot, i) => {
+                dot.classList.toggle('active', i === timerPhase);
+            });
+        }
+
+        function toggleTimer() {
+            isRunning = !isRunning;
+            document.getElementById('timerPlayBtn').textContent = isRunning ? '⏸' : '▶';
+            if (isRunning) {
+                timerInterval = setInterval(() => {
+                    timerSeconds--;
+                    if (timerSeconds <= 0) nextPhase();
+                    updateTimerDisplay();
+                }, 1000);
+            } else {
+                clearInterval(timerInterval);
+            }
+        }
+
+        function nextPhase() {
+            timerPhase++;
+            if (timerPhase >= 3) {
+                completeExercise();
+                return;
+            }
+            const durations = [state.settings.eccentricDuration, state.settings.concentricDuration, state.settings.finalEccentricDuration];
+            timerSeconds = durations[timerPhase];
+        }
+
+        function skipPhase() {
+            nextPhase();
+            updateTimerDisplay();
+        }
+
+        function restartPhase() {
+            const durations = [state.settings.eccentricDuration, state.settings.concentricDuration, state.settings.finalEccentricDuration];
+            timerSeconds = durations[timerPhase];
+            updateTimerDisplay();
+        }
+
+        function completeExercise() {
+            clearInterval(timerInterval);
+            isRunning = false;
+            const name = document.getElementById('timerExerciseName').textContent;
+            if (!state.completedExercises.includes(name)) {
+                state.completedExercises.push(name);
+                const history = JSON.parse(localStorage.getItem('workout_history') || '[]');
+                history.unshift({ date: new Date().toISOString(), exercise: name, workout: state.currentWorkout });
+                localStorage.setItem('workout_history', JSON.stringify(history));
+            }
+            closeTimer();
+            renderExercises();
+            saveState();
+        }
+
+        // Stats
+        function updateStats() {
+            const history = JSON.parse(localStorage.getItem('workout_history') || '[]');
+            const uniqueDays = new Set(history.map(h => new Date(h.date).toDateString())).size;
+            const thisWeek = history.filter(h => new Date(h.date) > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)).length;
+            document.getElementById('statWorkouts').textContent = uniqueDays;
+            document.getElementById('statSets').textContent = history.length;
+            document.getElementById('statWeek').textContent = thisWeek;
+            document.getElementById('statStreak').textContent = calculateStreak(history);
+        }
+
+        function calculateStreak(history) {
+            let streak = 0;
+            const today = new Date();
+            for (let i = 0; i < 30; i++) {
+                const checkDate = new Date(today - i * 24 * 60 * 60 * 1000).toDateString();
+                if (history.some(h => new Date(h.date).toDateString() === checkDate)) streak++;
+                else if (i > 0) break;
+            }
+            return streak;
+        }
+
+        // Log
+        function updateLog() {
+            const history = JSON.parse(localStorage.getItem('workout_history') || '[]');
+            const container = document.getElementById('logList');
+            if (history.length === 0) {
+                container.innerHTML = '<div class="empty-state"><h3>No Workouts Yet</h3><p>Start a workout to begin tracking</p></div>';
+                return;
+            }
+            const grouped = {};
+            history.forEach(h => {
+                const date = new Date(h.date).toDateString();
+                if (!grouped[date]) grouped[date] = [];
+                grouped[date].push(h);
+            });
+            container.innerHTML = Object.entries(grouped).slice(0, 10).map(([date, exercises]) => `
+                <div class="log-entry">
+                    <div class="log-header">
+                        <span class="log-date">${formatDate(new Date(date))}</span>
+                        <span class="log-type">Workout ${exercises[0].workout}</span>
+                    </div>
+                    <div class="log-exercises">
+                        ${exercises.map(e => `<span class="log-tag">${e.exercise}</span>`).join('')}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function formatDate(date) {
+            return date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+        }
+
+        // Settings
+        function saveSetting(key, value) {
+            state.settings[key] = value;
+            saveState();
+            syncToCloud();
+        }
+
+        // Persistence
+        function saveState() {
+            localStorage.setItem('onerepstrength_state', JSON.stringify(state));
+        }
+
+        function loadState() {
+            const saved = localStorage.getItem('onerepstrength_state');
+            if (saved) {
+                state = { ...state, ...JSON.parse(saved) };
+                document.getElementById('voiceGender').value = state.settings.voiceGender;
+                document.getElementById('coachingMode').value = state.settings.coachingMode;
+                document.getElementById('eccentricDuration').value = state.settings.eccentricDuration;
+                document.getElementById('concentricDuration').value = state.settings.concentricDuration;
+                document.getElementById('finalEccentricDuration').value = state.settings.finalEccentricDuration;
+            }
+        }
+
+        // Auth
+        function showAuth() {
+            document.getElementById('authOverlay').classList.add('active');
+        }
+
+        function skipAuth() {
+            document.getElementById('authOverlay').classList.remove('active');
+        }
+
+        function toggleAuthMode() {
+            isSignUp = !isSignUp;
+            document.querySelector('.auth-btn').textContent = isSignUp ? 'Sign Up' : 'Sign In';
+            document.querySelector('.auth-toggle a').textContent = isSignUp ? 'Sign In' : 'Sign Up';
+        }
+
+        async function handleAuth() {
+            const email = document.getElementById('authEmail').value;
+            const password = document.getElementById('authPassword').value;
+            let result;
+            if (isSignUp) {
+                result = await supabaseClient.auth.signUp({ email, password });
+            } else {
+                result = await supabaseClient.auth.signInWithPassword({ email, password });
+            }
+            if (result.error) {
+                alert(result.error.message);
+            } else {
+                currentUser = result.data.user;
+                updateAuthUI();
+                skipAuth();
+                syncFromCloud();
+            }
+        }
+
+        async function signOut() {
+            await supabaseClient.auth.signOut();
+            currentUser = null;
+            updateAuthUI();
+        }
+
+        // Cloud Sync
+        async function syncToCloud() {
+            if (!supabaseClient || !currentUser) return;
+            await supabaseClient.from('user_settings').upsert({
+                user_id: currentUser.id,
+                settings: state.settings,
+                updated_at: new Date().toISOString()
+            });
+        }
+
+        async function syncFromCloud() {
+            if (!supabaseClient || !currentUser) return;
+            const { data } = await supabaseClient.from('user_settings').select('settings').eq('user_id', currentUser.id).single();
+            if (data?.settings) {
+                state.settings = { ...state.settings, ...data.settings };
+                saveState();
+                loadState();
+            }
+        }
+
+        // Install Banner
+        function checkInstallBanner() {
+            const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+            const dismissed = localStorage.getItem('installBannerDismissed');
+            if (!isStandalone && !dismissed && /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
+                document.getElementById('installBanner').classList.add('show');
+            }
+        }
+
+        function hideInstallBanner() {
+            document.getElementById('installBanner').classList.remove('show');
+            localStorage.setItem('installBannerDismissed', 'true');
+        }
+
+        // Smooth scroll
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth' });
+                    document.getElementById('navLinks').classList.remove('active');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

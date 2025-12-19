@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>One Rep Timer | One Rep Strength</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Libre+Franklin:wght@400;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --color-bg: #1c1917;
+            --color-card: #292524;
+            --color-primary: #0ea5e9;
+            --color-down: #3b82f6;
+            --color-up: #22c55e;
+            --color-text: #fafaf9;
+            --color-text-dim: #a8a29e;
+            --color-border: #44403c;
+            --font-main: 'Libre Franklin', -apple-system, sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-main);
+            background: var(--color-bg);
+            color: var(--color-text);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header */
+        header {
+            background: var(--color-card);
+            border-bottom: 1px solid var(--color-border);
+            padding: 1rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: var(--color-text);
+            text-decoration: none;
+        }
+
+        .logo span {
+            color: var(--color-primary);
+        }
+
+        .back-link {
+            color: var(--color-primary);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        /* Main Timer */
+        main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        /* Protocol Selector */
+        .protocol-selector {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .protocol-btn {
+            padding: 0.75rem 1.25rem;
+            background: var(--color-card);
+            border: 2px solid var(--color-border);
+            border-radius: 8px;
+            color: var(--color-text);
+            font-family: var(--font-main);
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .protocol-btn:hover {
+            border-color: var(--color-primary);
+        }
+
+        .protocol-btn.active {
+            border-color: var(--color-primary);
+            background: rgba(14, 165, 233, 0.1);
+        }
+
+        /* Phase Display */
+        .phase-display {
+            margin-bottom: 1rem;
+        }
+
+        .phase-label {
+            font-size: 1.5rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 0.5rem;
+        }
+
+        .phase-label.down {
+            color: var(--color-down);
+        }
+
+        .phase-label.up {
+            color: var(--color-up);
+        }
+
+        .phase-instruction {
+            font-size: 1.1rem;
+            color: var(--color-text-dim);
+        }
+
+        /* Timer Display */
+        .timer-display {
+            font-size: clamp(8rem, 25vw, 14rem);
+            font-weight: 800;
+            line-height: 1;
+            margin: 1rem 0;
+            font-variant-numeric: tabular-nums;
+            transition: color 0.3s;
+        }
+
+        .timer-display.down {
+            color: var(--color-down);
+        }
+
+        .timer-display.up {
+            color: var(--color-up);
+        }
+
+        /* Target Display */
+        .target-display {
+            font-size: 1.25rem;
+            color: var(--color-text-dim);
+            margin-bottom: 2rem;
+        }
+
+        .target-display strong {
+            color: var(--color-text);
+        }
+
+        /* Progress Bar */
+        .progress-container {
+            width: 100%;
+            max-width: 500px;
+            margin-bottom: 2rem;
+        }
+
+        .progress-phases {
+            display: flex;
+            gap: 4px;
+            margin-bottom: 0.5rem;
+        }
+
+        .progress-phase {
+            flex: 1;
+            height: 8px;
+            background: var(--color-card);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            width: 0%;
+            transition: width 0.1s linear;
+        }
+
+        .progress-phase.down .progress-fill {
+            background: var(--color-down);
+        }
+
+        .progress-phase.up .progress-fill {
+            background: var(--color-up);
+        }
+
+        .progress-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            color: var(--color-text-dim);
+        }
+
+        /* Controls */
+        .controls {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .btn {
+            padding: 1.25rem 2.5rem;
+            font-family: var(--font-main);
+            font-size: 1.25rem;
+            font-weight: 700;
+            border-radius: 12px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-start {
+            background: var(--color-up);
+            color: white;
+            min-width: 160px;
+        }
+
+        .btn-start:hover {
+            background: #16a34a;
+        }
+
+        .btn-start.running {
+            background: #eab308;
+        }
+
+        .btn-secondary {
+            background: var(--color-card);
+            color: var(--color-text);
+            border: 2px solid var(--color-border);
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--color-primary);
+            color: var(--color-primary);
+        }
+
+        /* Audio Toggle */
+        .audio-toggle {
+            margin-top: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1rem;
+            color: var(--color-text-dim);
+        }
+
+        .audio-toggle input {
+            width: 22px;
+            height: 22px;
+            accent-color: var(--color-primary);
+        }
+
+        /* Completion Screen */
+        .completion {
+            display: none;
+        }
+
+        .completion.show {
+            display: block;
+        }
+
+        .completion h2 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--color-up);
+            margin-bottom: 1rem;
+        }
+
+        .completion-stats {
+            display: flex;
+            gap: 2rem;
+            justify-content: center;
+            margin: 2rem 0;
+        }
+
+        .completion-stat {
+            text-align: center;
+        }
+
+        .completion-stat .value {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--color-text);
+        }
+
+        .completion-stat .label {
+            font-size: 0.9rem;
+            color: var(--color-text-dim);
+        }
+
+        /* Exercise Counter */
+        .exercise-counter {
+            background: var(--color-card);
+            border-radius: 12px;
+            padding: 1rem 1.5rem;
+            margin-bottom: 2rem;
+            display: inline-block;
+        }
+
+        .exercise-counter .label {
+            font-size: 0.85rem;
+            color: var(--color-text-dim);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .exercise-counter .count {
+            font-size: 1.5rem;
+            font-weight: 800;
+        }
+
+        /* Halfway Alert */
+        .halfway-alert {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: var(--color-card);
+            border: 3px solid var(--color-primary);
+            border-radius: 16px;
+            padding: 2rem 3rem;
+            font-size: 1.5rem;
+            font-weight: 700;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+            z-index: 100;
+        }
+
+        .halfway-alert.show {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <a href="index.html" class="logo">One Rep <span>Strength</span></a>
+        <a href="index.html" class="back-link">← Back</a>
+    </header>
+
+    <main>
+        <!-- Protocol Selector -->
+        <div class="protocol-selector">
+            <button class="protocol-btn" onclick="setProtocol(10,10,10,this)">10-10-10</button>
+            <button class="protocol-btn" onclick="setProtocol(15,15,15,this)">15-15-15</button>
+            <button class="protocol-btn" onclick="setProtocol(20,15,25,this)">20-15-25</button>
+            <button class="protocol-btn active" onclick="setProtocol(30,20,40,this)">30-20-40</button>
+            <button class="protocol-btn" onclick="setProtocol(30,30,30,this)">30-30-30</button>
+        </div>
+
+        <!-- Exercise Counter -->
+        <div class="exercise-counter">
+            <div class="label">Exercise</div>
+            <div class="count"><span id="currentExercise">1</span> of 6</div>
+        </div>
+
+        <!-- Timer Content -->
+        <div id="timerContent">
+            <div class="phase-display">
+                <div class="phase-label down" id="phaseLabel">LOWER</div>
+                <div class="phase-instruction" id="phaseInstruction">Lower the weight slowly and smoothly</div>
+            </div>
+
+            <div class="timer-display down" id="timerDisplay">0</div>
+
+            <div class="target-display">
+                Target: <strong id="targetTime">30</strong> seconds
+            </div>
+
+            <!-- Progress Bar -->
+            <div class="progress-container">
+                <div class="progress-phases">
+                    <div class="progress-phase down" id="progress1">
+                        <div class="progress-fill" id="fill1"></div>
+                    </div>
+                    <div class="progress-phase up" id="progress2">
+                        <div class="progress-fill" id="fill2"></div>
+                    </div>
+                    <div class="progress-phase down" id="progress3">
+                        <div class="progress-fill" id="fill3"></div>
+                    </div>
+                </div>
+                <div class="progress-labels">
+                    <span>Lower 1</span>
+                    <span>Lift</span>
+                    <span>Lower 2</span>
+                </div>
+            </div>
+
+            <div class="controls">
+                <button class="btn btn-start" id="startBtn" onclick="toggleTimer()">Start</button>
+                <button class="btn btn-secondary" onclick="resetPhase()">Reset Phase</button>
+                <button class="btn btn-secondary" onclick="nextPhase()">Next Phase</button>
+            </div>
+
+            <label class="audio-toggle">
+                <input type="checkbox" id="audioToggle" checked>
+                Sound On
+            </label>
+        </div>
+
+        <!-- Completion Screen -->
+        <div class="completion" id="completion">
+            <h2>✓ Rep Complete!</h2>
+            <div class="completion-stats">
+                <div class="completion-stat">
+                    <div class="value" id="totalTime">90</div>
+                    <div class="label">Seconds</div>
+                </div>
+                <div class="completion-stat">
+                    <div class="value" id="protocolHit">Yes</div>
+                    <div class="label">Hit Target</div>
+                </div>
+            </div>
+            <div class="controls">
+                <button class="btn btn-start" onclick="nextExercise()">Next Exercise</button>
+                <button class="btn btn-secondary" onclick="repeatRep()">Repeat Rep</button>
+            </div>
+        </div>
+
+        <!-- Halfway Alert -->
+        <div class="halfway-alert" id="halfwayAlert">HALFWAY</div>
+    </main>
+
+    <script>
+        // State
+        let timerInterval = null;
+        let currentSeconds = 0;
+        let currentPhase = 0;
+        let isRunning = false;
+        let phaseTimes = [30, 20, 40];
+        let actualTimes = [0, 0, 0];
+        let currentExercise = 1;
+        let halfwayShown = false;
+
+        // Audio
+        let audioContext = null;
+
+        function initAudio() {
+            if (!audioContext) {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            }
+        }
+
+        function playBeep(frequency = 800, duration = 150) {
+            if (!document.getElementById('audioToggle').checked) return;
+            initAudio();
+            
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            oscillator.frequency.value = frequency;
+            oscillator.type = 'sine';
+            
+            gainNode.gain.setValueAtTime(0.5, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duration / 1000);
+            
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + duration / 1000);
+        }
+
+        function playHalfway() {
+            playBeep(600, 200);
+        }
+
+        function playPhaseComplete() {
+            playBeep(880, 150);
+            setTimeout(() => playBeep(1100, 200), 170);
+        }
+
+        function playRepComplete() {
+            playBeep(880, 100);
+            setTimeout(() => playBeep(1100, 100), 120);
+            setTimeout(() => playBeep(1320, 200), 240);
+        }
+
+        // Protocol
+        function setProtocol(t1, t2, t3, btn) {
+            phaseTimes = [t1, t2, t3];
+            document.querySelectorAll('.protocol-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            resetAll();
+        }
+
+        // Timer
+        function toggleTimer() {
+            if (isRunning) {
+                pauseTimer();
+            } else {
+                startTimer();
+            }
+        }
+
+        function startTimer() {
+            initAudio();
+            isRunning = true;
+            document.getElementById('startBtn').textContent = 'Pause';
+            document.getElementById('startBtn').classList.add('running');
+            halfwayShown = false;
+
+            timerInterval = setInterval(() => {
+                currentSeconds++;
+                actualTimes[currentPhase] = currentSeconds;
+                updateDisplay();
+
+                // Halfway alert
+                const halfway = Math.floor(phaseTimes[currentPhase] / 2);
+                if (currentSeconds === halfway && !halfwayShown) {
+                    showHalfwayAlert();
+                    halfwayShown = true;
+                }
+
+                // Phase complete
+                if (currentSeconds >= phaseTimes[currentPhase]) {
+                    playPhaseComplete();
+                    
+                    if (currentPhase < 2) {
+                        // Move to next phase
+                        currentPhase++;
+                        currentSeconds = 0;
+                        halfwayShown = false;
+                        updateDisplay();
+                    } else {
+                        // Rep complete
+                        pauseTimer();
+                        showCompletion();
+                    }
+                }
+            }, 1000);
+        }
+
+        function pauseTimer() {
+            isRunning = false;
+            clearInterval(timerInterval);
+            document.getElementById('startBtn').textContent = 'Start';
+            document.getElementById('startBtn').classList.remove('running');
+        }
+
+        function resetPhase() {
+            pauseTimer();
+            currentSeconds = 0;
+            actualTimes[currentPhase] = 0;
+            halfwayShown = false;
+            updateDisplay();
+        }
+
+        function resetAll() {
+            pauseTimer();
+            currentSeconds = 0;
+            currentPhase = 0;
+            actualTimes = [0, 0, 0];
+            halfwayShown = false;
+            document.getElementById('timerContent').style.display = 'block';
+            document.getElementById('completion').classList.remove('show');
+            updateDisplay();
+        }
+
+        function nextPhase() {
+            if (currentPhase < 2) {
+                pauseTimer();
+                actualTimes[currentPhase] = currentSeconds;
+                currentPhase++;
+                currentSeconds = 0;
+                halfwayShown = false;
+                updateDisplay();
+            }
+        }
+
+        function updateDisplay() {
+            const phases = [
+                { label: 'LOWER', instruction: 'Lower the weight slowly and smoothly', class: 'down' },
+                { label: 'LIFT', instruction: 'Lift the weight with control', class: 'up' },
+                { label: 'LOWER', instruction: 'Final lower — stay in control', class: 'down' }
+            ];
+
+            const phase = phases[currentPhase];
+            
+            document.getElementById('phaseLabel').textContent = phase.label;
+            document.getElementById('phaseLabel').className = 'phase-label ' + phase.class;
+            document.getElementById('phaseInstruction').textContent = phase.instruction;
+            document.getElementById('timerDisplay').textContent = currentSeconds;
+            document.getElementById('timerDisplay').className = 'timer-display ' + phase.class;
+            document.getElementById('targetTime').textContent = phaseTimes[currentPhase];
+
+            // Update progress bars
+            for (let i = 0; i < 3; i++) {
+                const fill = document.getElementById(`fill${i + 1}`);
+                if (i < currentPhase) {
+                    fill.style.width = '100%';
+                } else if (i === currentPhase) {
+                    const percent = (currentSeconds / phaseTimes[i]) * 100;
+                    fill.style.width = Math.min(percent, 100) + '%';
+                } else {
+                    fill.style.width = '0%';
+                }
+            }
+        }
+
+        function showHalfwayAlert() {
+            playHalfway();
+            const alert = document.getElementById('halfwayAlert');
+            alert.classList.add('show');
+            setTimeout(() => alert.classList.remove('show'), 1000);
+        }
+
+        function showCompletion() {
+            playRepComplete();
+            const total = actualTimes.reduce((a, b) => a + b, 0);
+            const target = phaseTimes.reduce((a, b) => a + b, 0);
+            
+            document.getElementById('totalTime').textContent = total;
+            document.getElementById('protocolHit').textContent = total >= target ? 'Yes!' : 'Close';
+            document.getElementById('protocolHit').style.color = total >= target ? '#22c55e' : '#eab308';
+            
+            document.getElementById('timerContent').style.display = 'none';
+            document.getElementById('completion').classList.add('show');
+        }
+
+        function nextExercise() {
+            if (currentExercise < 6) {
+                currentExercise++;
+                document.getElementById('currentExercise').textContent = currentExercise;
+            }
+            resetAll();
+        }
+
+        function repeatRep() {
+            resetAll();
+        }
+
+        // Initialize
+        updateDisplay();
+    </script>
+</body>
+</html>
