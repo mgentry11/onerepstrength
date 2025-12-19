@@ -5,14 +5,14 @@
 const SUPABASE_URL = 'https://xmiwutflnqwcvdztgnwm.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhtaXd1dGZsbnF3Y3ZkenRnbndtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjYwOTgwNDMsImV4cCI6MjA4MTY3NDA0M30.EZN99LIMDnveKkDW2Xi5icOfnaAMeT95gRLOWcVuzrc';
 
-let supabase = null;
+let supabaseClient = null;
 let currentUser = null;
 
 // Initialize Supabase client
 function initSupabase() {
     try {
         if (window.supabase && window.supabase.createClient) {
-            supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
             checkAuthState();
         } else {
             console.log('Supabase not loaded, showing auth screen');
@@ -27,7 +27,7 @@ function initSupabase() {
 // ===== AUTH FUNCTIONS =====
 async function checkAuthState() {
     try {
-        const { data: { session } } = await supabase.auth.getSession();
+        const { data: { session } } = await supabaseClient.auth.getSession();
         if (session) {
             currentUser = session.user;
             showMainApp();
@@ -36,7 +36,7 @@ async function checkAuthState() {
         }
 
         // Listen for auth changes
-        supabase.auth.onAuthStateChange((event, session) => {
+        supabaseClient.auth.onAuthStateChange((event, session) => {
             if (event === 'SIGNED_IN' && session) {
                 currentUser = session.user;
                 showMainApp();
@@ -110,7 +110,7 @@ async function handleLogin(event) {
     const errorEl = document.getElementById('loginError');
     const submitBtn = event.target.querySelector('button[type="submit"]');
 
-    if (!supabase) {
+    if (!supabaseClient) {
         errorEl.textContent = 'Connection error. Try refreshing.';
         return;
     }
@@ -119,7 +119,7 @@ async function handleLogin(event) {
     errorEl.textContent = '';
 
     try {
-        const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+        const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
         submitBtn.disabled = false;
         if (error) {
             errorEl.textContent = error.message;
@@ -138,7 +138,7 @@ async function handleSignup(event) {
     const errorEl = document.getElementById('signupError');
     const submitBtn = event.target.querySelector('button[type="submit"]');
 
-    if (!supabase) {
+    if (!supabaseClient) {
         errorEl.textContent = 'Connection error. Try refreshing.';
         return;
     }
@@ -152,7 +152,7 @@ async function handleSignup(event) {
     errorEl.textContent = '';
 
     try {
-        const { data, error } = await supabase.auth.signUp({ email, password });
+        const { data, error } = await supabaseClient.auth.signUp({ email, password });
         submitBtn.disabled = false;
 
         if (error) {
@@ -173,8 +173,8 @@ function continueAsGuest() {
 }
 
 async function handleLogout() {
-    if (supabase && currentUser) {
-        await supabase.auth.signOut();
+    if (supabaseClient && currentUser) {
+        await supabaseClient.auth.signOut();
     }
     currentUser = null;
     showAuthScreen();
@@ -184,7 +184,7 @@ async function handleLogout() {
 let currentSessionId = null;
 
 async function startWorkoutSession(workoutType) {
-    if (!supabase || !currentUser) return null;
+    if (!supabaseClient || !currentUser) return null;
 
     const { data, error } = await supabase
         .from('workout_sessions')
@@ -204,7 +204,7 @@ async function startWorkoutSession(workoutType) {
 }
 
 async function syncExerciseLog(entry) {
-    if (!supabase || !currentUser) return;
+    if (!supabaseClient || !currentUser) return;
 
     // Start session if not started
     if (!currentSessionId) {
@@ -213,7 +213,7 @@ async function syncExerciseLog(entry) {
 
     if (!currentSessionId) return;
 
-    await supabase.from('exercise_logs').insert({
+    await supabaseClient.from('exercise_logs').insert({
         session_id: currentSessionId,
         exercise_name: entry.exerciseName,
         exercise_order: WORKOUTS[entry.workoutType].findIndex(e => e.name === entry.exerciseName) + 1,
@@ -224,9 +224,9 @@ async function syncExerciseLog(entry) {
 }
 
 async function syncExerciseWeight(exerciseName, weight, reachedFailure) {
-    if (!supabase || !currentUser) return;
+    if (!supabaseClient || !currentUser) return;
 
-    await supabase.from('exercise_weights').upsert({
+    await supabaseClient.from('exercise_weights').upsert({
         user_id: currentUser.id,
         exercise_name: exerciseName,
         last_weight_lbs: weight,
@@ -239,7 +239,7 @@ async function syncExerciseWeight(exerciseName, weight, reachedFailure) {
 }
 
 async function loadCloudWeights() {
-    if (!supabase || !currentUser) return;
+    if (!supabaseClient || !currentUser) return;
 
     const { data, error } = await supabase
         .from('exercise_weights')
@@ -258,7 +258,7 @@ async function loadCloudWeights() {
 }
 
 async function completeWorkoutSession() {
-    if (!supabase || !currentUser || !currentSessionId) return;
+    if (!supabaseClient || !currentUser || !currentSessionId) return;
 
     await supabase
         .from('workout_sessions')
