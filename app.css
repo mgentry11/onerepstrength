@@ -1,49 +1,52 @@
 /* One Rep Strength - Web App */
-/* Light Blue/White Theme - Website Style */
+/* Yellow, Purple & Black Dark Theme */
 
 /* ===== VARIABLES ===== */
 :root {
-    /* Primary Blue Theme from Website */
-    --primary: #0369a1;
-    --primary-dark: #075985;
-    --primary-light: #0ea5e9;
-    --accent: #0369a1;
-    --accent-light: rgba(3, 105, 161, 0.1);
+    /* Primary Gold/Yellow */
+    --gold: #FFD700;
+    --gold-dark: #B8860B;
+    --gold-light: #FFED4A;
 
-    /* Background colors - Light theme */
-    --bg: #fafaf9;
-    --bg-alt: #f5f5f4;
-    --bg-dark: #e7e5e4;
-    --card: #ffffff;
-    --black: #1c1917;
-    --gray-dark: #f5f5f4;
-    --gray-mid: #e7e5e4;
-    --gray-light: #d6d3d1;
+    /* Secondary Purple */
+    --purple: #7c3aed;
+    --purple-dark: #6d28d9;
+    --purple-light: #a78bfa;
+
+    /* Accent - Gold */
+    --accent: #FFD700;
+    --accent-light: rgba(255, 215, 0, 0.2);
+    --primary: #FFD700;
+
+    /* Background colors - Dark theme */
+    --bg: #000000;
+    --bg-alt: #1a1a1a;
+    --bg-dark: #0a0a0a;
+    --card: #1C1C1E;
+    --black: #000000;
+    --gray-dark: #1C1C1E;
+    --gray-mid: #2C2C2E;
+    --gray-light: #3A3A3C;
 
     /* Text colors */
-    --text: #1c1917;
-    --text-light: #44403c;
-    --text-secondary: #78716c;
-    --white: #ffffff;
+    --text: #FFFFFF;
+    --text-light: #E5E5E5;
+    --text-secondary: #8E8E93;
+    --white: #FFFFFF;
 
     /* Border */
-    --border: #e7e5e4;
+    --border: #3A3A3C;
 
-    /* Phase colors - Blue for eccentric, lighter blue for concentric */
-    --phase-eccentric: #3b82f6;
-    --phase-concentric: #0ea5e9;
-    --phase-final: #0369a1;
+    /* Phase colors - Gold/Purple */
+    --phase-eccentric: #7c3aed;
+    --phase-concentric: #FFD700;
+    --phase-final: #a78bfa;
 
     /* Status colors */
-    --red: #dc2626;
-    --orange: #f97316;
-    --blue: #0369a1;
-    --green: #22c55e;
-
-    /* Legacy compatibility */
-    --gold: #0369a1;
-    --gold-dark: #075985;
-    --gold-light: rgba(3, 105, 161, 0.2);
+    --red: #FF3B30;
+    --orange: #FF9500;
+    --blue: #007AFF;
+    --green: #22C55E;
 }
 
 /* ===== RESET ===== */
@@ -1063,7 +1066,7 @@ body {
 .auth-logo h1 {
     font-size: 28px;
     font-weight: 700;
-    color: var(--text);
+    color: var(--gold);
     margin-top: 16px;
 }
 
@@ -1096,8 +1099,8 @@ body {
 }
 
 .auth-tab.active {
-    background: var(--primary);
-    color: white;
+    background: var(--gold);
+    color: var(--black);
 }
 
 .auth-form {
@@ -1131,10 +1134,10 @@ body {
 .auth-submit {
     width: 100%;
     padding: 16px;
-    background: var(--primary);
+    background: var(--gold);
     border: none;
     border-radius: 12px;
-    color: white;
+    color: var(--black);
     font-size: 17px;
     font-weight: 600;
     cursor: pointer;
@@ -1142,7 +1145,7 @@ body {
 }
 
 .auth-submit:hover {
-    background: #075985;
+    background: #E6C200;
 }
 
 .auth-submit:disabled {
