@@ -1028,6 +1028,32 @@
         let currentUser = null;
         let isSignUp = false;
 
+        // Speech Synthesis
+        let synth = window.speechSynthesis;
+
+        function speak(text) {
+            if (!synth) return;
+            try {
+                synth.cancel();
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.rate = 0.9;
+                utterance.pitch = 1;
+                const voices = synth.getVoices();
+                if (voices.length > 0) {
+                    let preferredVoice;
+                    if (state.settings.voiceGender === 'female') {
+                        preferredVoice = voices.find(v => v.name.toLowerCase().includes('samantha') || v.name.toLowerCase().includes('female'));
+                    } else {
+                        preferredVoice = voices.find(v => v.name.toLowerCase().includes('daniel') || v.name.toLowerCase().includes('male'));
+                    }
+                    if (preferredVoice) utterance.voice = preferredVoice;
+                }
+                synth.speak(utterance);
+            } catch (e) {
+                console.warn('Speech synthesis error:', e);
+            }
+        }
+
         // Workout Data
         const WORKOUTS = {
             A: ['Leg Press', 'Leg Curl', 'Leg Extension', 'Chest Press', 'Seated Row', 'Shoulder Press', 'Lat Pulldown', 'Bicep Curl'],
@@ -1126,11 +1152,13 @@
             document.getElementById('timerExerciseName').textContent = name;
             document.getElementById('timerModal').classList.add('active');
             resetTimer();
+            speak(name);
         }
 
         function closeTimer() {
             clearInterval(timerInterval);
             isRunning = false;
+            synth.cancel();
             document.getElementById('timerModal').classList.remove('active');
         }
 
@@ -1139,6 +1167,7 @@
         let timerSeconds = 30;
         let timerPhase = 0;
         let isRunning = false;
+        const PHASE_NAMES = ['Lower', 'Lift', 'Lower'];
 
         function resetTimer() {
             timerPhase = 0;
@@ -1164,13 +1193,21 @@
             isRunning = !isRunning;
             document.getElementById('timerPlayBtn').textContent = isRunning ? '⏸' : '▶';
             if (isRunning) {
+                speak(PHASE_NAMES[timerPhase]);
                 timerInterval = setInterval(() => {
                     timerSeconds--;
+                    // Countdown based on coaching mode
+                    if (state.settings.coachingMode === 'countdown' && timerSeconds <= 10 && timerSeconds > 0) {
+                        speak(timerSeconds.toString());
+                    } else if (state.settings.coachingMode === 'full' && timerSeconds > 0) {
+                        speak(timerSeconds.toString());
+                    }
                     if (timerSeconds <= 0) nextPhase();
                     updateTimerDisplay();
                 }, 1000);
             } else {
                 clearInterval(timerInterval);
+                synth.cancel();
             }
         }
 
@@ -1182,6 +1219,7 @@
             }
             const durations = [state.settings.eccentricDuration, state.settings.concentricDuration, state.settings.finalEccentricDuration];
             timerSeconds = durations[timerPhase];
+            speak(PHASE_NAMES[timerPhase]);
         }
 
         function skipPhase() {
@@ -1196,6 +1234,7 @@
         }
 
         function completeExercise() {
+            speak('Complete! Great work!');
             clearInterval(timerInterval);
             isRunning = false;
             const name = document.getElementById('timerExerciseName').textContent;
