@@ -275,23 +275,27 @@ async function completeWorkoutSession() {
 const WORKOUTS = {
     A: [
         { name: 'Leg Press', icon: 'leg-press' },
-        { name: 'Pulldown', icon: 'pulldown' },
         { name: 'Chest Press', icon: 'chest-press' },
-        { name: 'Overhead Press', icon: 'overhead-press' },
+        { name: 'Lat Pulldown', icon: 'pulldown' },
+        { name: 'Shoulder Press', icon: 'overhead-press' },
         { name: 'Leg Curl', icon: 'leg-curl' },
-        { name: 'Bicep Curl', icon: 'bicep-curl' },
-        { name: 'Tricep Extension', icon: 'tricep-extension' },
-        { name: 'Calf Raise', icon: 'calf-raise' }
+        { name: 'Calf Raise', icon: 'calf-raise' },
+        { name: 'Ab Crunch', icon: 'ab-crunch' },
+        { name: 'Back Extension', icon: 'back-extension' },
+        { name: 'Hip Abduction', icon: 'hip-abduction' },
+        { name: 'Hip Adduction', icon: 'hip-adduction' }
     ],
     B: [
         { name: 'Leg Extension', icon: 'leg-extension' },
         { name: 'Seated Row', icon: 'seated-row' },
-        { name: 'Incline Press', icon: 'incline-press' },
+        { name: 'Chest Fly', icon: 'chest-fly' },
+        { name: 'Bicep Curl', icon: 'bicep-curl' },
+        { name: 'Tricep Extension', icon: 'tricep-extension' },
         { name: 'Lateral Raise', icon: 'lateral-raise' },
-        { name: 'Leg Curl', icon: 'leg-curl' },
-        { name: 'Shrug', icon: 'shrug' },
-        { name: 'Ab Crunch', icon: 'ab-crunch' },
-        { name: 'Back Extension', icon: 'back-extension' }
+        { name: 'Leg Press', icon: 'leg-press' },
+        { name: 'Overhead Press', icon: 'overhead-press' },
+        { name: 'Preacher Curl', icon: 'preacher-curl' },
+        { name: 'Cable Pushdown', icon: 'cable-pushdown' }
     ]
 };
 

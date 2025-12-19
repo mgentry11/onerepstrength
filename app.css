@@ -1,49 +1,45 @@
 /* One Rep Strength - Web App */
-/* Clean Light Theme matching onerepstrength.fit website */
+/* Yellow/Gold & Black Theme - Original HIT Coach Pro Style */
 
 /* ===== VARIABLES ===== */
 :root {
-    /* Main colors from website */
-    --primary: #0369a1;
-    --accent: #0369a1;
-    --accent-light: #dbeafe;
+    /* Gold/Yellow Theme */
+    --gold: #FFD700;
+    --gold-dark: #B8860B;
+    --gold-light: #FFED4A;
+    --accent: #FFD700;
+    --accent-light: rgba(255, 215, 0, 0.2);
+    --primary: #FFD700;
 
-    /* Background colors */
-    --bg: #fafaf9;
-    --bg-alt: #f5f5f4;
-    --bg-dark: #1c1917;
-    --card: #ffffff;
+    /* Background colors - Dark theme */
+    --bg: #000000;
+    --bg-alt: #1a1a1a;
+    --bg-dark: #0a0a0a;
+    --card: #1C1C1E;
+    --black: #000000;
+    --gray-dark: #1C1C1E;
+    --gray-mid: #2C2C2E;
+    --gray-light: #3A3A3C;
 
     /* Text colors */
-    --text: #1c1917;
-    --text-light: #57534e;
-    --text-secondary: #78716c;
+    --text: #FFFFFF;
+    --text-light: #E5E5E5;
+    --text-secondary: #8E8E93;
+    --white: #FFFFFF;
 
     /* Border */
-    --border: #e7e5e4;
+    --border: #3A3A3C;
 
-    /* Phase colors - Blue for negative, Green for positive */
-    --phase-eccentric: #3b82f6;
-    --phase-concentric: #22c55e;
-    --phase-final: #2563eb;
-    --negative-bg: #dbeafe;
-    --positive-bg: #dcfce7;
+    /* Phase colors */
+    --phase-eccentric: #007AFF;
+    --phase-concentric: #22C55E;
+    --phase-final: #FF9500;
 
     /* Status colors */
-    --red: #dc2626;
-    --orange: #f97316;
-
-    /* Legacy compatibility */
-    --gold: #059669;
-    --gold-dark: #047857;
-    --gold-light: #d1fae5;
-    --black: #1c1917;
-    --gray-dark: #f5f5f4;
-    --gray-mid: #e7e5e4;
-    --gray-light: #d6d3d1;
-    --white: #1c1917;
-    --blue: #3b82f6;
-    --green: #22c55e;
+    --red: #FF3B30;
+    --orange: #FF9500;
+    --blue: #007AFF;
+    --green: #22C55E;
 }
 
 /* ===== RESET ===== */
@@ -1063,12 +1059,8 @@ body {
 .auth-logo h1 {
     font-size: 28px;
     font-weight: 700;
-    color: var(--text);
+    color: var(--gold);
     margin-top: 16px;
-}
-
-.auth-logo h1 span {
-    color: var(--primary);
 }
 
 .auth-logo p {
@@ -1100,8 +1092,8 @@ body {
 }
 
 .auth-tab.active {
-    background: var(--accent);
-    color: white;
+    background: var(--gold);
+    color: var(--black);
 }
 
 .auth-form {
@@ -1135,10 +1127,10 @@ body {
 .auth-submit {
     width: 100%;
     padding: 16px;
-    background: var(--accent);
+    background: var(--gold);
     border: none;
     border-radius: 12px;
-    color: white;
+    color: var(--black);
     font-size: 17px;
     font-weight: 600;
     cursor: pointer;
@@ -1146,7 +1138,7 @@ body {
 }
 
 .auth-submit:hover {
-    background: #075985;
+    background: #E6C200;
 }
 
 .auth-submit:disabled {
