@@ -5,8 +5,8 @@
 :root {
     /* Main colors from website */
     --primary: #0369a1;
-    --accent: #059669;
-    --accent-light: #d1fae5;
+    --accent: #0369a1;
+    --accent-light: #dbeafe;
 
     /* Background colors */
     --bg: #fafaf9;
@@ -1146,7 +1146,7 @@ body {
 }
 
 .auth-submit:hover {
-    background: #047857;
+    background: #075985;
 }
 
 .auth-submit:disabled {
