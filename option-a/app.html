@@ -894,6 +894,19 @@
         // Voice Coaching System
         let synth = window.speechSynthesis;
         let currentAudio = null;
+        let voicesLoaded = false;
+
+        // Load voices (they may not be available immediately)
+        function loadVoices() {
+            const voices = synth.getVoices();
+            if (voices.length > 0) {
+                voicesLoaded = true;
+            }
+        }
+        loadVoices();
+        if (synth.onvoiceschanged !== undefined) {
+            synth.onvoiceschanged = loadVoices;
+        }
 
         // Voice coach personalities with ElevenLabs audio paths and phrases
         const VOICE_COACHES = {
@@ -968,70 +981,69 @@
         // Audio cache for preloaded ElevenLabs audio
         const audioCache = {};
 
-        // Speak function - tries ElevenLabs audio first, falls back to Web Speech API
+        // Speak function - uses Web Speech API with coach phrases
         function speak(text, phraseKey = null) {
-            // Stop any current audio
+            // Stop any current speech
             if (currentAudio) {
                 currentAudio.pause();
                 currentAudio = null;
             }
-            synth.cancel();
+            if (synth) synth.cancel();
 
             const coach = VOICE_COACHES[state.settings.voiceCoach] || VOICE_COACHES.calm;
 
             // Get coach-specific phrase if available
             let phrase = text;
-            if (phraseKey && coach.phrases[phraseKey]) {
+            if (phraseKey && coach.phrases && coach.phrases[phraseKey]) {
                 phrase = coach.phrases[phraseKey];
             }
 
-            // Try to play ElevenLabs audio file
-            const audioPath = `audio/${state.settings.voiceCoach}/${phraseKey || text}.mp3`;
-            tryPlayAudio(audioPath, phrase);
-        }
+            // Don't speak if no phrase
+            if (!phrase) {
+                console.warn('No phrase to speak:', { text, phraseKey });
+                return;
+            }
 
-        function tryPlayAudio(path, fallbackText) {
-            // For now, use Web Speech API (ElevenLabs audio files to be added)
-            // When audio files are ready, uncomment this:
-            /*
-            const audio = new Audio(path);
-            audio.oncanplaythrough = () => {
-                currentAudio = audio;
-                audio.play();
-            };
-            audio.onerror = () => {
-                speakWithSynthesis(fallbackText);
-            };
-            */
-            speakWithSynthesis(fallbackText);
+            console.log('Speaking:', phrase);
+            speakWithSynthesis(phrase);
         }
 
         function speakWithSynthesis(text) {
-            if (!synth) return;
+            if (!synth || !text) return;
+
             try {
                 const utterance = new SpeechSynthesisUtterance(text);
                 utterance.rate = 0.9;
                 utterance.pitch = 1;
+                utterance.volume = 1;
 
                 const voices = synth.getVoices();
+                console.log('Available voices:', voices.length);
+
                 if (voices.length > 0) {
                     let preferredVoice;
                     if (state.settings.voiceGender === 'female') {
                         preferredVoice = voices.find(v =>
                             v.name.toLowerCase().includes('samantha') ||
+                            v.name.toLowerCase().includes('karen') ||
                             v.name.toLowerCase().includes('female')
                         );
                     } else {
                         preferredVoice = voices.find(v =>
                             v.name.toLowerCase().includes('daniel') ||
+                            v.name.toLowerCase().includes('alex') ||
                             v.name.toLowerCase().includes('male')
                         );
                     }
-                    if (preferredVoice) utterance.voice = preferredVoice;
+                    if (preferredVoice) {
+                        utterance.voice = preferredVoice;
+                        console.log('Using voice:', preferredVoice.name);
+                    }
                 }
+
                 synth.speak(utterance);
             } catch (e) {
-                console.warn('Speech synthesis error:', e);
+                console.error('Speech synthesis error:', e);
             }
         }
 
@@ -1119,10 +1131,18 @@
             }
         }
 
+        // Admin emails get all premium features free
+        const ADMIN_EMAILS = ['mark@metabomaxpro.com'];
+
         async function checkAuth() {
             const { data: { session } } = await supabaseClient.auth.getSession();
             if (session) {
                 currentUser = session.user;
+                // Check if user is admin
+                if (ADMIN_EMAILS.includes(currentUser.email.toLowerCase())) {
+                    state.isPremium = true;
+                    updateVoiceUI();
+                }
                 updateAuthUI();
             }
         }
@@ -1135,7 +1155,7 @@
             if (currentUser) {
                 syncBanner.style.display = 'none';
                 signOutBtn.style.display = 'block';
-                userEmail.textContent = currentUser.email;
+                userEmail.textContent = currentUser.email + (state.isPremium ? ' (Pro)' : '');
             } else {
                 syncBanner.style.display = 'block';
                 signOutBtn.style.display = 'none';
@@ -1161,6 +1181,11 @@
                 alert(error.message);
             } else {
                 currentUser = data.user;
+                // Check if admin
+                if (ADMIN_EMAILS.includes(currentUser.email.toLowerCase())) {
+                    state.isPremium = true;
+                    updateVoiceUI();
+                }
                 updateAuthUI();
                 skipAuth();
                 syncFromCloud();
@@ -1170,7 +1195,9 @@
         async function signOut() {
             await supabaseClient.auth.signOut();
             currentUser = null;
+            state.isPremium = false;
             updateAuthUI();
+            updateVoiceUI();
         }
 
         // Tab Navigation

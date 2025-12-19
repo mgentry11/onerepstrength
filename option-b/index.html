@@ -1207,6 +1207,17 @@
         // Voice Coaching System
         let synth = window.speechSynthesis;
         let currentAudio = null;
+        let voicesLoaded = false;
+
+        // Load voices (they may not be available immediately)
+        function loadVoices() {
+            const voices = synth.getVoices();
+            if (voices.length > 0) voicesLoaded = true;
+        }
+        loadVoices();
+        if (synth.onvoiceschanged !== undefined) {
+            synth.onvoiceschanged = loadVoices;
+        }
 
         const VOICE_COACHES = {
             calm: { name: 'Calm', premium: false, phrases: { lower: 'Lower slowly', lift: 'Now lift', finalLower: 'Final lower', complete: 'Well done', encouragement: ['Keep breathing', 'Stay focused'] }},
@@ -1219,27 +1230,30 @@
 
         function speak(text, phraseKey = null) {
             if (currentAudio) { currentAudio.pause(); currentAudio = null; }
-            synth.cancel();
+            if (synth) synth.cancel();
             const coach = VOICE_COACHES[state.settings.voiceCoach] || VOICE_COACHES.calm;
             let phrase = text;
-            if (phraseKey && coach.phrases[phraseKey]) phrase = coach.phrases[phraseKey];
+            if (phraseKey && coach.phrases && coach.phrases[phraseKey]) phrase = coach.phrases[phraseKey];
+            if (!phrase) { console.warn('No phrase:', { text, phraseKey }); return; }
+            console.log('Speaking:', phrase);
             speakWithSynthesis(phrase);
         }
 
         function speakWithSynthesis(text) {
-            if (!synth) return;
+            if (!synth || !text) return;
             try {
                 const utterance = new SpeechSynthesisUtterance(text);
                 utterance.rate = 0.9;
+                utterance.volume = 1;
                 const voices = synth.getVoices();
                 if (voices.length > 0) {
                     let preferredVoice = state.settings.voiceGender === 'female' ?
-                        voices.find(v => v.name.toLowerCase().includes('samantha') || v.name.toLowerCase().includes('female')) :
-                        voices.find(v => v.name.toLowerCase().includes('daniel') || v.name.toLowerCase().includes('male'));
+                        voices.find(v => v.name.toLowerCase().includes('samantha') || v.name.toLowerCase().includes('karen')) :
+                        voices.find(v => v.name.toLowerCase().includes('daniel') || v.name.toLowerCase().includes('alex'));
                     if (preferredVoice) utterance.voice = preferredVoice;
                 }
                 synth.speak(utterance);
-            } catch (e) { console.warn('Speech error:', e); }
+            } catch (e) { console.error('Speech error:', e); }
         }
 
         function selectVoice(voiceId) {
@@ -1298,10 +1312,18 @@
             }
         }
 
+        // Admin emails get all premium features free
+        const ADMIN_EMAILS = ['mark@metabomaxpro.com'];
+
         async function checkAuth() {
             const { data: { session } } = await supabaseClient.auth.getSession();
             if (session) {
                 currentUser = session.user;
+                // Check if admin
+                if (ADMIN_EMAILS.includes(currentUser.email.toLowerCase())) {
+                    state.isPremium = true;
+                    updateVoiceUI();
+                }
                 updateAuthUI();
             }
         }
@@ -1311,7 +1333,7 @@
             const userEmail = document.getElementById('userEmail');
             if (currentUser) {
                 syncBanner.style.display = 'none';
-                userEmail.textContent = currentUser.email;
+                userEmail.textContent = currentUser.email + (state.isPremium ? ' (Pro)' : '');
             } else {
                 syncBanner.style.display = 'block';
                 userEmail.textContent = 'Guest';
@@ -1569,6 +1591,11 @@
                 alert(result.error.message);
             } else {
                 currentUser = result.data.user;
+                // Check if admin
+                if (ADMIN_EMAILS.includes(currentUser.email.toLowerCase())) {
+                    state.isPremium = true;
+                    updateVoiceUI();
+                }
                 updateAuthUI();
                 skipAuth();
                 syncFromCloud();
@@ -1578,7 +1605,9 @@
         async function signOut() {
             await supabaseClient.auth.signOut();
             currentUser = null;
+            state.isPremium = false;
             updateAuthUI();
+            updateVoiceUI();
         }
 
         // Cloud Sync
