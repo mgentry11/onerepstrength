@@ -166,33 +166,47 @@
         }
         .progress-text strong { color: var(--color-accent); }
 
-        /* Exercise List */
-        .exercise-list {
-            display: flex;
-            flex-direction: column;
+        /* Exercise Grid */
+        .exercise-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
             gap: 0.75rem;
         }
 
         .exercise-card {
             display: flex;
+            flex-direction: column;
             align-items: center;
-            gap: 1rem;
-            padding: 1rem;
+            text-align: center;
+            padding: 1rem 0.75rem;
             background: var(--color-card);
-            border: 1px solid var(--color-border);
+            border: 2px solid var(--color-border);
             border-radius: 12px;
             cursor: pointer;
             transition: all 0.2s;
+            min-height: 90px;
         }
-        .exercise-card:hover { border-color: var(--color-primary); }
+        .exercise-card:hover {
+            border-color: var(--color-primary);
+            transform: scale(1.02);
+        }
         .exercise-card.completed {
             border-color: var(--color-accent);
             background: rgba(5, 150, 105, 0.1);
         }
+        .exercise-card.completed::after {
+            content: '✓';
+            position: absolute;
+            top: 0.25rem;
+            right: 0.5rem;
+            color: var(--color-accent);
+            font-weight: 700;
+        }
+        .exercise-card { position: relative; }
 
         .exercise-number {
-            width: 32px;
-            height: 32px;
+            width: 28px;
+            height: 28px;
             background: var(--color-primary);
             color: white;
             border-radius: 50%;
@@ -200,34 +214,22 @@
             align-items: center;
             justify-content: center;
             font-weight: 700;
-            font-size: 0.9rem;
-            flex-shrink: 0;
+            font-size: 0.8rem;
+            margin-bottom: 0.5rem;
         }
         .exercise-card.completed .exercise-number {
             background: var(--color-accent);
         }
 
-        .exercise-info { flex: 1; }
         .exercise-name {
             font-weight: 700;
-            font-size: 1rem;
-            margin-bottom: 0.25rem;
-        }
-        .exercise-weight {
             font-size: 0.85rem;
-            color: var(--color-text-dim);
+            line-height: 1.2;
         }
 
         .exercise-start-btn {
-            padding: 0.5rem 1rem;
-            background: var(--color-primary);
-            border: none;
-            border-radius: 8px;
-            color: white;
-            font-weight: 600;
-            cursor: pointer;
+            display: none; /* Hidden in grid view - whole card is clickable */
         }
-        .exercise-start-btn:hover { opacity: 0.9; }
 
         /* Protocol Selector */
         .protocol-section {
@@ -672,7 +674,7 @@
             <span class="progress-text"><strong id="progressCount">0/8</strong> exercises completed</span>
         </div>
 
-        <div class="exercise-list" id="exerciseList">
+        <div class="exercise-grid" id="exerciseList">
             <!-- Populated by JS -->
         </div>
     </div>
@@ -1176,19 +1178,15 @@
         }
 
         function renderExercises() {
-            const list = document.getElementById('exerciseList');
+            const grid = document.getElementById('exerciseList');
             const exercises = WORKOUTS[state.currentWorkout];
 
-            list.innerHTML = exercises.map((name, i) => {
+            grid.innerHTML = exercises.map((name, i) => {
                 const completed = state.completedExercises.includes(name);
                 return `
                     <div class="exercise-card ${completed ? 'completed' : ''}" onclick="startExercise('${name}')">
                         <div class="exercise-number">${i + 1}</div>
-                        <div class="exercise-info">
-                            <div class="exercise-name">${name}</div>
-                            <div class="exercise-weight">Tap to start</div>
-                        </div>
-                        <button class="exercise-start-btn">Start</button>
+                        <div class="exercise-name">${name}</div>
                     </div>
                 `;
             }).join('');
