@@ -10,32 +10,45 @@ let currentUser = null;
 
 // Initialize Supabase client
 function initSupabase() {
-    if (window.supabase) {
-        supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-        checkAuthState();
+    try {
+        if (window.supabase && window.supabase.createClient) {
+            supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            checkAuthState();
+        } else {
+            console.log('Supabase not loaded, showing auth screen');
+            showAuthScreen();
+        }
+    } catch (e) {
+        console.error('Supabase init error:', e);
+        showAuthScreen();
     }
 }
 
 // ===== AUTH FUNCTIONS =====
 async function checkAuthState() {
-    const { data: { session } } = await supabase.auth.getSession();
-    if (session) {
-        currentUser = session.user;
-        showMainApp();
-    } else {
-        showAuthScreen();
-    }
-
-    // Listen for auth changes
-    supabase.auth.onAuthStateChange((event, session) => {
-        if (event === 'SIGNED_IN' && session) {
+    try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session) {
             currentUser = session.user;
             showMainApp();
-        } else if (event === 'SIGNED_OUT') {
-            currentUser = null;
+        } else {
             showAuthScreen();
         }
-    });
+
+        // Listen for auth changes
+        supabase.auth.onAuthStateChange((event, session) => {
+            if (event === 'SIGNED_IN' && session) {
+                currentUser = session.user;
+                showMainApp();
+            } else if (event === 'SIGNED_OUT') {
+                currentUser = null;
+                showAuthScreen();
+            }
+        });
+    } catch (e) {
+        console.error('Auth check error:', e);
+        showAuthScreen();
+    }
 }
 
 function showAuthScreen() {
@@ -97,15 +110,23 @@ async function handleLogin(event) {
     const errorEl = document.getElementById('loginError');
     const submitBtn = event.target.querySelector('button[type="submit"]');
 
+    if (!supabase) {
+        errorEl.textContent = 'Connection error. Try refreshing.';
+        return;
+    }
+
     submitBtn.disabled = true;
     errorEl.textContent = '';
 
-    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-
-    submitBtn.disabled = false;
-
-    if (error) {
-        errorEl.textContent = error.message;
+    try {
+        const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+        submitBtn.disabled = false;
+        if (error) {
+            errorEl.textContent = error.message;
+        }
+    } catch (e) {
+        submitBtn.disabled = false;
+        errorEl.textContent = 'Login failed. Please try again.';
     }
 }
 
@@ -117,6 +138,11 @@ async function handleSignup(event) {
     const errorEl = document.getElementById('signupError');
     const submitBtn = event.target.querySelector('button[type="submit"]');
 
+    if (!supabase) {
+        errorEl.textContent = 'Connection error. Try refreshing.';
+        return;
+    }
+
     if (password !== confirm) {
         errorEl.textContent = 'Passwords do not match';
         return;
@@ -125,15 +151,19 @@ async function handleSignup(event) {
     submitBtn.disabled = true;
     errorEl.textContent = '';
 
-    const { data, error } = await supabase.auth.signUp({ email, password });
+    try {
+        const { data, error } = await supabase.auth.signUp({ email, password });
+        submitBtn.disabled = false;
 
-    submitBtn.disabled = false;
-
-    if (error) {
-        errorEl.textContent = error.message;
-    } else if (data.user && !data.session) {
-        errorEl.style.color = '#22c55e';
-        errorEl.textContent = 'Check your email to confirm your account';
+        if (error) {
+            errorEl.textContent = error.message;
+        } else if (data.user && !data.session) {
+            errorEl.style.color = '#0369a1';
+            errorEl.textContent = 'Check your email to confirm your account';
+        }
+    } catch (e) {
+        submitBtn.disabled = false;
+        errorEl.textContent = 'Signup failed. Please try again.';
     }
 }
 
