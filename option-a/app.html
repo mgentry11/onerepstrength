@@ -890,6 +890,7 @@
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhtaXd1dGZsbnF3Y3ZkenRnbndtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjYwOTgwNDMsImV4cCI6MjA4MTY3NDA0M30.EZN99LIMDnveKkDW2Xi5icOfnaAMeT95gRLOWcVuzrc';
         let supabaseClient = null;
         let currentUser = null;
+        let isSignUp = false;
 
         // Voice Coaching System
         let synth = window.speechSynthesis;
@@ -1171,24 +1172,47 @@
             document.getElementById('authOverlay').classList.remove('active');
         }
 
+        function toggleAuthMode() {
+            isSignUp = !isSignUp;
+            document.querySelector('.auth-btn').textContent = isSignUp ? 'Sign Up' : 'Sign In';
+            document.querySelector('.auth-subtitle').textContent = isSignUp ? 'Create an account to sync' : 'Sign in to sync across devices';
+            document.querySelector('.auth-toggle').innerHTML = isSignUp ?
+                'Already have an account? <a onclick="toggleAuthMode()">Sign In</a>' :
+                'Don\'t have an account? <a onclick="toggleAuthMode()">Sign Up</a>';
+        }
+
         async function handleAuth() {
             const email = document.getElementById('authEmail').value;
             const password = document.getElementById('authPassword').value;
 
-            const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+            if (!email || !password) {
+                alert('Please enter email and password');
+                return;
+            }
 
-            if (error) {
-                alert(error.message);
+            let result;
+            if (isSignUp) {
+                result = await supabaseClient.auth.signUp({ email, password });
             } else {
-                currentUser = data.user;
+                result = await supabaseClient.auth.signInWithPassword({ email, password });
+            }
+
+            if (result.error) {
+                alert(result.error.message);
+            } else {
+                currentUser = result.data.user;
                 // Check if admin
-                if (ADMIN_EMAILS.includes(currentUser.email.toLowerCase())) {
+                if (currentUser && ADMIN_EMAILS.includes(currentUser.email.toLowerCase())) {
                     state.isPremium = true;
                     updateVoiceUI();
                 }
                 updateAuthUI();
                 skipAuth();
                 syncFromCloud();
+
+                if (isSignUp) {
+                    alert('Account created! Check your email to confirm.');
+                }
             }
         }
 
