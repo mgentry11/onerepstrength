@@ -1212,3 +1212,161 @@ body {
 .logout-btn svg {
     stroke: currentColor;
 }
+
+/* ===== PHONE FRAME (Desktop Only) ===== */
+@media (min-width: 500px) {
+    body {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-start;
+        padding: 20px;
+        gap: 20px;
+    }
+
+    .phone-frame {
+        position: relative;
+        width: 375px;
+        height: 812px;
+        background: #1c1917;
+        border-radius: 50px;
+        padding: 12px;
+        box-shadow:
+            0 25px 50px -12px rgba(0, 0, 0, 0.5),
+            inset 0 0 0 3px #2d2d2d;
+    }
+
+    .phone-notch {
+        position: absolute;
+        top: 12px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 150px;
+        height: 30px;
+        background: #1c1917;
+        border-radius: 0 0 20px 20px;
+        z-index: 1000;
+    }
+
+    .phone-screen {
+        width: 100%;
+        height: 100%;
+        background: var(--bg);
+        border-radius: 40px;
+        overflow: hidden;
+        position: relative;
+    }
+
+    .app-container {
+        height: 100%;
+        overflow-y: auto;
+        overflow-x: hidden;
+    }
+}
+
+/* Mobile: No frame */
+@media (max-width: 499px) {
+    .phone-frame,
+    .phone-notch {
+        display: contents;
+    }
+
+    .phone-screen {
+        display: contents;
+    }
+}
+
+/* ===== INSTALL BANNER ===== */
+.install-banner {
+    background: white;
+    border-radius: 16px;
+    padding: 20px 24px;
+    max-width: 375px;
+    width: 100%;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+}
+
+.install-content {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.install-icon {
+    flex-shrink: 0;
+}
+
+.install-text h3 {
+    font-size: 16px;
+    font-weight: 700;
+    color: #1c1917;
+    margin-bottom: 4px;
+}
+
+.install-text p {
+    font-size: 13px;
+    color: #78716c;
+    margin: 0;
+}
+
+.install-btn {
+    flex-shrink: 0;
+    padding: 10px 20px;
+    background: var(--purple);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+    display: none;
+}
+
+.install-btn:hover {
+    background: var(--purple-dark);
+}
+
+.install-instructions {
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid #e7e5e4;
+}
+
+.install-instructions p {
+    font-size: 13px;
+    color: #78716c;
+    margin: 8px 0;
+}
+
+.install-instructions strong {
+    color: #1c1917;
+}
+
+.share-icon {
+    display: inline-block;
+    background: #0369a1;
+    color: white;
+    width: 20px;
+    height: 20px;
+    line-height: 20px;
+    text-align: center;
+    border-radius: 4px;
+    font-size: 12px;
+}
+
+/* Hide install banner on mobile (when in standalone mode) */
+@media (display-mode: standalone) {
+    .install-banner {
+        display: none;
+    }
+}
+
+/* Hide install banner on mobile (shown in browser) */
+@media (max-width: 499px) {
+    .install-banner {
+        display: none;
+    }
+}

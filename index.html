@@ -34,7 +34,31 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
-    <div class="app-container">
+    <!-- Install Banner (shown on desktop) -->
+    <div class="install-banner" id="installBanner">
+        <div class="install-content">
+            <div class="install-icon">
+                <svg viewBox="0 0 24 24" width="40" height="40" fill="#0369a1">
+                    <path d="M20.57 14.86L22 13.43 20.57 12 17 15.57 8.43 7 12 3.43 10.57 2 9.14 3.43 7.71 2 5.57 4.14 4.14 2.71 2.71 4.14l1.43 1.43L2 7.71l1.43 1.43L2 10.57 3.43 12 7 8.43 15.57 17 12 20.57 13.43 22l1.43-1.43L16.29 22l2.14-2.14 1.43 1.43 1.43-1.43-1.43-1.43L22 16.29z"/>
+                </svg>
+            </div>
+            <div class="install-text">
+                <h3>One Rep Strength</h3>
+                <p>Add to your home screen for the best experience</p>
+            </div>
+            <button class="install-btn" id="installBtn">Install App</button>
+        </div>
+        <div class="install-instructions" id="installInstructions">
+            <p><strong>iOS:</strong> Tap <span class="share-icon">⬆</span> then "Add to Home Screen"</p>
+            <p><strong>Android:</strong> Tap menu ⋮ then "Add to Home Screen"</p>
+        </div>
+    </div>
+
+    <!-- Phone Frame (shown on desktop) -->
+    <div class="phone-frame">
+        <div class="phone-notch"></div>
+        <div class="phone-screen">
+            <div class="app-container">
         <!-- Status Bar -->
         <div class="status-bar">
             <span class="status-time" id="statusTime">9:41</span>
@@ -470,7 +494,43 @@
             </button>
         </nav>
     </div>
+        </div><!-- end phone-screen -->
+    </div><!-- end phone-frame -->
 
     <script src="app.js"></script>
+    <script>
+        // PWA Install handling
+        let deferredPrompt;
+        const installBtn = document.getElementById('installBtn');
+        const installBanner = document.getElementById('installBanner');
+        const installInstructions = document.getElementById('installInstructions');
+
+        // Check if already installed as PWA
+        if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone) {
+            installBanner.style.display = 'none';
+        }
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            installInstructions.style.display = 'none';
+            installBtn.style.display = 'block';
+        });
+
+        installBtn.addEventListener('click', async () => {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                if (outcome === 'accepted') {
+                    installBanner.style.display = 'none';
+                }
+                deferredPrompt = null;
+            }
+        });
+
+        window.addEventListener('appinstalled', () => {
+            installBanner.style.display = 'none';
+        });
+    </script>
 </body>
 </html>
