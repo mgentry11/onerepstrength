@@ -359,29 +359,35 @@
         }
         .progress-indicator strong { color: var(--color-accent); }
 
-        /* Exercise Grid */
+        /* Exercise Grid - 3 columns, auto-expanding */
         .exercise-grid {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 0.5rem;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.4rem;
+        }
+        .exercise-grid.auto-fit {
+            grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
         }
         .exercise-item {
             display: flex;
             flex-direction: column;
             align-items: center;
+            justify-content: center;
             text-align: center;
-            padding: 0.75rem 0.5rem;
+            padding: 0.5rem 0.25rem;
             background: var(--color-card);
             border: 2px solid var(--color-border);
-            border-radius: 10px;
+            border-radius: 8px;
             cursor: pointer;
             transition: all 0.2s;
             position: relative;
-            min-height: 70px;
+            aspect-ratio: 1;
+            min-height: 60px;
         }
         .exercise-item:hover {
             border-color: var(--color-primary);
-            transform: scale(1.02);
+            transform: scale(1.03);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
         .exercise-item.completed {
             border-color: var(--color-accent);
@@ -390,15 +396,15 @@
         .exercise-item.completed::after {
             content: '✓';
             position: absolute;
-            top: 0.2rem;
-            right: 0.4rem;
+            top: 0.15rem;
+            right: 0.3rem;
             color: var(--color-accent);
             font-weight: 700;
-            font-size: 0.8rem;
+            font-size: 0.7rem;
         }
         .exercise-num {
-            width: 24px;
-            height: 24px;
+            width: 20px;
+            height: 20px;
             background: var(--color-primary);
             color: white;
             border-radius: 50%;
@@ -406,14 +412,15 @@
             align-items: center;
             justify-content: center;
             font-weight: 700;
-            font-size: 0.7rem;
-            margin-bottom: 0.4rem;
+            font-size: 0.6rem;
+            margin-bottom: 0.3rem;
         }
         .exercise-item.completed .exercise-num { background: var(--color-accent); }
         .exercise-name {
             font-weight: 600;
-            font-size: 0.75rem;
-            line-height: 1.2;
+            font-size: 0.65rem;
+            line-height: 1.1;
+            word-break: break-word;
         }
         .exercise-start { display: none; }
 
@@ -1337,6 +1344,14 @@
         function renderExercises() {
             const grid = document.getElementById('exerciseList');
             const exercises = WORKOUTS[state.currentWorkout];
+
+            // Auto-fit for larger exercise counts (more than 9)
+            if (exercises.length > 9) {
+                grid.classList.add('auto-fit');
+            } else {
+                grid.classList.remove('auto-fit');
+            }
+
             grid.innerHTML = exercises.map((name, i) => {
                 const completed = state.completedExercises.includes(name);
                 return `
