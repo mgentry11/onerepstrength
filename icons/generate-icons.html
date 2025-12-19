@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head><title>Icon Generator</title></head>
+<body>
+<canvas id="c" width="512" height="512"></canvas>
+<script>
+const sizes = [512, 192, 180, 152, 144, 120, 32, 16];
+const canvas = document.getElementById('c');
+const ctx = canvas.getContext('2d');
+
+function generateIcon(size) {
+    canvas.width = size;
+    canvas.height = size;
+    
+    // Black background
+    ctx.fillStyle = '#000000';
+    ctx.fillRect(0, 0, size, size);
+    
+    // Gold dumbbell icon
+    ctx.fillStyle = '#FFD700';
+    const scale = size / 512;
+    ctx.save();
+    ctx.translate(size/2, size/2);
+    ctx.scale(scale, scale);
+    
+    // Draw "1R" text
+    ctx.font = 'bold 200px -apple-system, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('1R', 0, 0);
+    
+    ctx.restore();
+    
+    return canvas.toDataURL('image/png');
+}
+
+sizes.forEach(size => {
+    const dataUrl = generateIcon(size);
+    const link = document.createElement('a');
+    link.download = size > 100 ? `icon-${size}.png` : `favicon-${size}.png`;
+    link.href = dataUrl;
+    document.body.appendChild(link);
+    link.innerHTML = `Download ${link.download}<br>`;
+});
+</script>
+<p>Click links above to download icons, or right-click canvas and save</p>
+</body>
+</html>

@@ -49,6 +49,26 @@ function showMainApp() {
     loadState();
     renderExerciseList();
     updateProgressDisplay();
+    updateAccountDisplay();
+
+    // Load weights from cloud if logged in
+    if (currentUser) {
+        loadCloudWeights();
+    }
+}
+
+function updateAccountDisplay() {
+    const emailDisplay = document.getElementById('userEmailDisplay');
+    const logoutBtn = document.getElementById('logoutBtn');
+
+    if (currentUser) {
+        emailDisplay.textContent = currentUser.email;
+        logoutBtn.style.display = 'flex';
+    } else {
+        emailDisplay.textContent = 'Guest';
+        logoutBtn.textContent = 'Sign In';
+        logoutBtn.onclick = () => showAuthScreen();
+    }
 }
 
 function showAuthTab(tab) {
@@ -128,6 +148,97 @@ async function handleLogout() {
     }
     currentUser = null;
     showAuthScreen();
+}
+
+// ===== SUPABASE DATA SYNC =====
+let currentSessionId = null;
+
+async function startWorkoutSession(workoutType) {
+    if (!supabase || !currentUser) return null;
+
+    const { data, error } = await supabase
+        .from('workout_sessions')
+        .insert({
+            user_id: currentUser.id,
+            workout_type: workoutType,
+            started_at: new Date().toISOString()
+        })
+        .select()
+        .single();
+
+    if (!error && data) {
+        currentSessionId = data.id;
+        return data.id;
+    }
+    return null;
+}
+
+async function syncExerciseLog(entry) {
+    if (!supabase || !currentUser) return;
+
+    // Start session if not started
+    if (!currentSessionId) {
+        await startWorkoutSession(entry.workoutType);
+    }
+
+    if (!currentSessionId) return;
+
+    await supabase.from('exercise_logs').insert({
+        session_id: currentSessionId,
+        exercise_name: entry.exerciseName,
+        exercise_order: WORKOUTS[entry.workoutType].findIndex(e => e.name === entry.exerciseName) + 1,
+        weight_lbs: entry.weight,
+        reached_failure: entry.reachedFailure,
+        logged_at: entry.date
+    });
+}
+
+async function syncExerciseWeight(exerciseName, weight, reachedFailure) {
+    if (!supabase || !currentUser) return;
+
+    await supabase.from('exercise_weights').upsert({
+        user_id: currentUser.id,
+        exercise_name: exerciseName,
+        last_weight_lbs: weight,
+        last_reached_failure: reachedFailure,
+        personal_best_lbs: weight,
+        updated_at: new Date().toISOString()
+    }, {
+        onConflict: 'user_id,exercise_name'
+    });
+}
+
+async function loadCloudWeights() {
+    if (!supabase || !currentUser) return;
+
+    const { data, error } = await supabase
+        .from('exercise_weights')
+        .select('*')
+        .eq('user_id', currentUser.id);
+
+    if (!error && data) {
+        data.forEach(record => {
+            const key = `hitcoach_weight_${state.currentProfile}_${record.exercise_name}`;
+            localStorage.setItem(key, JSON.stringify({
+                weight: record.last_weight_lbs,
+                reachedFailure: record.last_reached_failure
+            }));
+        });
+    }
+}
+
+async function completeWorkoutSession() {
+    if (!supabase || !currentUser || !currentSessionId) return;
+
+    await supabase
+        .from('workout_sessions')
+        .update({
+            completed_at: new Date().toISOString(),
+            exercises_completed: state.completedExercises.length
+        })
+        .eq('id', currentSessionId);
+
+    currentSessionId = null;
 }
 
 // ===== WORKOUT DATA =====
@@ -650,6 +761,9 @@ function skipRest() {
 
 // ===== WORKOUT MANAGEMENT =====
 function finishWorkout() {
+    // Complete the session in Supabase
+    completeWorkoutSession();
+
     // Clear completion checkmarks but keep weights
     state.completedExercises = [];
     saveCompletionState();
@@ -702,6 +816,9 @@ function addToHistory(entry) {
     const history = JSON.parse(localStorage.getItem(key) || '[]');
     history.unshift(entry);
     localStorage.setItem(key, JSON.stringify(history));
+
+    // Sync to Supabase if logged in
+    syncExerciseLog(entry);
 }
 
 function getHistory() {
@@ -950,6 +1067,9 @@ function loadCompletionState() {
 function saveExerciseWeight(exerciseName, weight, reachedFailure) {
     const key = `hitcoach_weight_${state.currentProfile}_${exerciseName}`;
     localStorage.setItem(key, JSON.stringify({ weight, reachedFailure }));
+
+    // Sync to Supabase if logged in
+    syncExerciseWeight(exerciseName, weight, reachedFailure);
 }
 
 function getLastWeight(exerciseName) {

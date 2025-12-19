@@ -1139,3 +1139,31 @@ body {
     border-color: var(--gold);
     color: var(--gold);
 }
+
+/* Logout Button */
+.logout-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    padding: 14px;
+    margin-top: 12px;
+    background: transparent;
+    border: 1px solid var(--red);
+    border-radius: 10px;
+    color: var(--red);
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.logout-btn:hover {
+    background: var(--red);
+    color: var(--white);
+}
+
+.logout-btn svg {
+    stroke: currentColor;
+}
