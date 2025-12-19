@@ -319,6 +319,44 @@
             font-family: var(--font-main);
         }
 
+        /* Voice Grid */
+        .voice-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.75rem;
+        }
+        .voice-card {
+            background: var(--color-card);
+            border: 2px solid var(--color-border);
+            border-radius: 12px;
+            padding: 1rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+        }
+        .voice-card:hover { border-color: var(--color-primary); }
+        .voice-card.active {
+            border-color: var(--color-primary);
+            background: rgba(3, 105, 161, 0.1);
+        }
+        .voice-card.premium { opacity: 0.7; }
+        .voice-card.premium.unlocked { opacity: 1; }
+        .voice-icon { font-size: 2rem; margin-bottom: 0.5rem; }
+        .voice-name { font-weight: 700; font-size: 0.95rem; }
+        .voice-desc { font-size: 0.8rem; color: var(--color-text-dim); margin-top: 0.25rem; }
+        .voice-badge {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            background: linear-gradient(135deg, var(--color-purple), var(--color-primary));
+            color: white;
+            font-size: 0.65rem;
+            font-weight: 700;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+        }
+
         /* Buttons */
         .btn {
             padding: 1rem 2rem;
@@ -706,7 +744,49 @@
         </div>
 
         <div class="settings-section">
-            <h3 class="section-title">Voice</h3>
+            <h3 class="section-title">Coaching Voice</h3>
+            <div class="voice-grid" id="voiceGrid">
+                <!-- Free Voices -->
+                <div class="voice-card active" onclick="selectVoice('calm')" id="voiceCalm">
+                    <div class="voice-icon">🧘</div>
+                    <div class="voice-name">Calm</div>
+                    <div class="voice-desc">Gentle guidance</div>
+                </div>
+                <div class="voice-card" onclick="selectVoice('standard')" id="voiceStandard">
+                    <div class="voice-icon">🎯</div>
+                    <div class="voice-name">Standard</div>
+                    <div class="voice-desc">Clear & direct</div>
+                </div>
+                <!-- Premium Voices -->
+                <div class="voice-card premium" onclick="selectVoice('commander')" id="voiceCommander">
+                    <div class="voice-icon">🎖️</div>
+                    <div class="voice-name">Commander</div>
+                    <div class="voice-desc">Military precision</div>
+                    <div class="voice-badge">PRO</div>
+                </div>
+                <div class="voice-card premium" onclick="selectVoice('motivator')" id="voiceMotivator">
+                    <div class="voice-icon">🔥</div>
+                    <div class="voice-name">Motivator</div>
+                    <div class="voice-desc">High energy hype</div>
+                    <div class="voice-badge">PRO</div>
+                </div>
+                <div class="voice-card premium" onclick="selectVoice('drill')" id="voiceDrill">
+                    <div class="voice-icon">💪</div>
+                    <div class="voice-name">Drill Sergeant</div>
+                    <div class="voice-desc">No excuses</div>
+                    <div class="voice-badge">PRO</div>
+                </div>
+                <div class="voice-card premium" onclick="selectVoice('zen')" id="voiceZen">
+                    <div class="voice-icon">☯️</div>
+                    <div class="voice-name">Zen Master</div>
+                    <div class="voice-desc">Mindful movement</div>
+                    <div class="voice-badge">PRO</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="settings-section">
+            <h3 class="section-title">Voice Settings</h3>
             <div class="setting-row">
                 <span class="setting-label">Voice Gender</span>
                 <select id="voiceGender" onchange="saveSetting('voiceGender', this.value)">
@@ -715,12 +795,11 @@
                 </select>
             </div>
             <div class="setting-row">
-                <span class="setting-label">Coaching Mode</span>
+                <span class="setting-label">Countdown Mode</span>
                 <select id="coachingMode" onchange="saveSetting('coachingMode', this.value)">
                     <option value="phaseOnly">Phase Only</option>
-                    <option value="countdown">10s Countdown</option>
-                    <option value="full">Full Countdown</option>
-                    <option value="encouragement">With Encouragement</option>
+                    <option value="countdown">Last 10 Seconds</option>
+                    <option value="full">Every Second</option>
                 </select>
             </div>
         </div>
@@ -794,32 +873,140 @@
         let supabaseClient = null;
         let currentUser = null;
 
-        // Speech Synthesis
+        // Voice Coaching System
         let synth = window.speechSynthesis;
+        let currentAudio = null;
 
-        function speak(text) {
+        // Voice coach personalities with ElevenLabs audio paths and phrases
+        const VOICE_COACHES = {
+            calm: {
+                name: 'Calm',
+                premium: false,
+                phrases: {
+                    lower: 'Lower slowly',
+                    lift: 'Now lift',
+                    finalLower: 'Final lower',
+                    complete: 'Well done',
+                    encouragement: ['Keep breathing', 'Stay focused', 'You\'re doing great']
+                }
+            },
+            standard: {
+                name: 'Standard',
+                premium: false,
+                phrases: {
+                    lower: 'Lower',
+                    lift: 'Lift',
+                    finalLower: 'Lower',
+                    complete: 'Complete',
+                    encouragement: ['Good', 'Keep going', 'Almost there']
+                }
+            },
+            commander: {
+                name: 'Commander',
+                premium: true,
+                phrases: {
+                    lower: 'Initiate descent! Slow and controlled!',
+                    lift: 'Drive it up! Full power!',
+                    finalLower: 'Final descent! Make it count!',
+                    complete: 'Mission accomplished! Outstanding work, soldier!',
+                    encouragement: ['Stay strong!', 'No surrender!', 'Push through!', 'Dig deep!']
+                }
+            },
+            motivator: {
+                name: 'Motivator',
+                premium: true,
+                phrases: {
+                    lower: 'Here we go! Nice and slow!',
+                    lift: 'Let\'s gooo! Push it!',
+                    finalLower: 'Last one! You got this!',
+                    complete: 'Yes! Crushed it! You\'re amazing!',
+                    encouragement: ['You\'re on fire!', 'Beast mode!', 'Unstoppable!', 'Champion!']
+                }
+            },
+            drill: {
+                name: 'Drill Sergeant',
+                premium: true,
+                phrases: {
+                    lower: 'Down! Control that weight!',
+                    lift: 'Up! Move it!',
+                    finalLower: 'Down! Don\'t quit on me!',
+                    complete: 'Done! That\'s how it\'s done!',
+                    encouragement: ['No excuses!', 'Pain is weakness leaving!', 'Earn it!']
+                }
+            },
+            zen: {
+                name: 'Zen Master',
+                premium: true,
+                phrases: {
+                    lower: 'Descend mindfully... feel each moment',
+                    lift: 'Rise with intention... breathe',
+                    finalLower: 'One final journey down... embrace it',
+                    complete: 'Peace. You have honored your body today.',
+                    encouragement: ['Be present', 'Flow like water', 'Mind and muscle are one']
+                }
+            }
+        };
+
+        // Audio cache for preloaded ElevenLabs audio
+        const audioCache = {};
+
+        // Speak function - tries ElevenLabs audio first, falls back to Web Speech API
+        function speak(text, phraseKey = null) {
+            // Stop any current audio
+            if (currentAudio) {
+                currentAudio.pause();
+                currentAudio = null;
+            }
+            synth.cancel();
+
+            const coach = VOICE_COACHES[state.settings.voiceCoach] || VOICE_COACHES.calm;
+
+            // Get coach-specific phrase if available
+            let phrase = text;
+            if (phraseKey && coach.phrases[phraseKey]) {
+                phrase = coach.phrases[phraseKey];
+            }
+
+            // Try to play ElevenLabs audio file
+            const audioPath = `audio/${state.settings.voiceCoach}/${phraseKey || text}.mp3`;
+            tryPlayAudio(audioPath, phrase);
+        }
+
+        function tryPlayAudio(path, fallbackText) {
+            // For now, use Web Speech API (ElevenLabs audio files to be added)
+            // When audio files are ready, uncomment this:
+            /*
+            const audio = new Audio(path);
+            audio.oncanplaythrough = () => {
+                currentAudio = audio;
+                audio.play();
+            };
+            audio.onerror = () => {
+                speakWithSynthesis(fallbackText);
+            };
+            */
+            speakWithSynthesis(fallbackText);
+        }
+
+        function speakWithSynthesis(text) {
             if (!synth) return;
             try {
-                synth.cancel(); // Stop any current speech
                 const utterance = new SpeechSynthesisUtterance(text);
                 utterance.rate = 0.9;
                 utterance.pitch = 1;
 
-                // Set voice based on gender setting
                 const voices = synth.getVoices();
                 if (voices.length > 0) {
                     let preferredVoice;
                     if (state.settings.voiceGender === 'female') {
                         preferredVoice = voices.find(v =>
                             v.name.toLowerCase().includes('samantha') ||
-                            v.name.toLowerCase().includes('female') ||
-                            v.name.toLowerCase().includes('woman')
+                            v.name.toLowerCase().includes('female')
                         );
                     } else {
                         preferredVoice = voices.find(v =>
                             v.name.toLowerCase().includes('daniel') ||
-                            v.name.toLowerCase().includes('male') ||
-                            v.name.toLowerCase().includes('man')
+                            v.name.toLowerCase().includes('male')
                         );
                     }
                     if (preferredVoice) utterance.voice = preferredVoice;
@@ -845,7 +1032,9 @@
         let state = {
             currentWorkout: 'A',
             completedExercises: [],
+            isPremium: false, // Set to true when user purchases premium
             settings: {
+                voiceCoach: 'calm',
                 voiceGender: 'male',
                 coachingMode: 'phaseOnly',
                 eccentricDuration: 30,
@@ -855,12 +1044,54 @@
             }
         };
 
+        // Voice selection function
+        function selectVoice(voiceId) {
+            const coach = VOICE_COACHES[voiceId];
+            if (!coach) return;
+
+            // Check if premium voice requires upgrade
+            if (coach.premium && !state.isPremium) {
+                alert('Upgrade to Pro to unlock premium coaching voices!');
+                return;
+            }
+
+            state.settings.voiceCoach = voiceId;
+            saveState();
+
+            // Update UI
+            document.querySelectorAll('.voice-card').forEach(card => {
+                card.classList.remove('active');
+            });
+            const selectedCard = document.getElementById('voice' + voiceId.charAt(0).toUpperCase() + voiceId.slice(1));
+            if (selectedCard) selectedCard.classList.add('active');
+
+            // Play a sample phrase
+            speak(null, 'lower');
+        }
+
+        function updateVoiceUI() {
+            document.querySelectorAll('.voice-card').forEach(card => {
+                card.classList.remove('active');
+            });
+            const voiceId = state.settings.voiceCoach || 'calm';
+            const selectedCard = document.getElementById('voice' + voiceId.charAt(0).toUpperCase() + voiceId.slice(1));
+            if (selectedCard) selectedCard.classList.add('active');
+
+            // Mark unlocked premium voices
+            if (state.isPremium) {
+                document.querySelectorAll('.voice-card.premium').forEach(card => {
+                    card.classList.add('unlocked');
+                });
+            }
+        }
+
         // Initialize
         document.addEventListener('DOMContentLoaded', () => {
             initSupabase();
             loadState();
             renderExercises();
             updateStats();
+            updateVoiceUI();
         });
 
         function initSupabase() {
@@ -985,7 +1216,7 @@
         let timerSeconds = 30;
         let timerPhase = 0;
         let isRunning = false;
-        const PHASE_NAMES = ['Lower', 'Lift', 'Lower'];
+        const PHASE_KEYS = ['lower', 'lift', 'finalLower']; // Keys for voice coach phrases
 
         function resetTimer() {
             timerPhase = 0;
@@ -1014,8 +1245,8 @@
             document.getElementById('timerPlayBtn').textContent = isRunning ? '⏸' : '▶';
 
             if (isRunning) {
-                // Speak the phase when starting
-                speak(PHASE_NAMES[timerPhase]);
+                // Speak the phase when starting using coach phrase
+                speak(null, PHASE_KEYS[timerPhase]);
 
                 timerInterval = setInterval(() => {
                     timerSeconds--;
@@ -1052,8 +1283,8 @@
             ];
             timerSeconds = durations[timerPhase];
 
-            // Announce the new phase
-            speak(PHASE_NAMES[timerPhase]);
+            // Announce the new phase using coach phrase
+            speak(null, PHASE_KEYS[timerPhase]);
         }
 
         function skipPhase() {
@@ -1074,7 +1305,7 @@
         function completeExercise() {
             clearInterval(timerInterval);
             isRunning = false;
-            speak('Complete! Great work!');
+            speak(null, 'complete');
 
             const name = document.getElementById('timerExerciseName').textContent;
             if (!state.completedExercises.includes(name)) {

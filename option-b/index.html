@@ -457,6 +457,45 @@
             color: var(--color-text);
             font-family: var(--font-heading);
         }
+
+        /* Voice Grid */
+        .voice-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.5rem;
+        }
+        .voice-card {
+            background: var(--color-card);
+            border: 2px solid var(--color-border);
+            border-radius: 10px;
+            padding: 0.75rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+        }
+        .voice-card:hover { border-color: var(--color-primary); }
+        .voice-card.active {
+            border-color: var(--color-primary);
+            background: rgba(3, 105, 161, 0.1);
+        }
+        .voice-card.premium { opacity: 0.7; }
+        .voice-card.premium.unlocked { opacity: 1; }
+        .voice-icon { font-size: 1.5rem; margin-bottom: 0.25rem; }
+        .voice-name { font-weight: 700; font-size: 0.85rem; }
+        .voice-desc { font-size: 0.7rem; color: var(--color-text-light); }
+        .voice-badge {
+            position: absolute;
+            top: 0.25rem;
+            right: 0.25rem;
+            background: linear-gradient(135deg, var(--color-purple), var(--color-primary));
+            color: white;
+            font-size: 0.55rem;
+            font-weight: 700;
+            padding: 0.15rem 0.35rem;
+            border-radius: 3px;
+        }
+
         .section-label {
             font-size: 0.75rem;
             font-weight: 600;
@@ -931,7 +970,41 @@
                             <button class="btn btn-primary" onclick="showAuth()">Sign In</button>
                         </div>
 
-                        <div class="section-label">Voice</div>
+                        <div class="section-label">Coaching Voice</div>
+                        <div class="voice-grid" id="voiceGrid">
+                            <div class="voice-card active" onclick="selectVoice('calm')" id="voiceCalm">
+                                <div class="voice-icon">🧘</div>
+                                <div class="voice-name">Calm</div>
+                                <div class="voice-desc">Gentle</div>
+                            </div>
+                            <div class="voice-card" onclick="selectVoice('standard')" id="voiceStandard">
+                                <div class="voice-icon">🎯</div>
+                                <div class="voice-name">Standard</div>
+                                <div class="voice-desc">Direct</div>
+                            </div>
+                            <div class="voice-card premium" onclick="selectVoice('commander')" id="voiceCommander">
+                                <div class="voice-icon">🎖️</div>
+                                <div class="voice-name">Commander</div>
+                                <div class="voice-badge">PRO</div>
+                            </div>
+                            <div class="voice-card premium" onclick="selectVoice('motivator')" id="voiceMotivator">
+                                <div class="voice-icon">🔥</div>
+                                <div class="voice-name">Motivator</div>
+                                <div class="voice-badge">PRO</div>
+                            </div>
+                            <div class="voice-card premium" onclick="selectVoice('drill')" id="voiceDrill">
+                                <div class="voice-icon">💪</div>
+                                <div class="voice-name">Drill Sgt</div>
+                                <div class="voice-badge">PRO</div>
+                            </div>
+                            <div class="voice-card premium" onclick="selectVoice('zen')" id="voiceZen">
+                                <div class="voice-icon">☯️</div>
+                                <div class="voice-name">Zen</div>
+                                <div class="voice-badge">PRO</div>
+                            </div>
+                        </div>
+
+                        <div class="section-label">Voice Settings</div>
                         <div class="setting-row">
                             <span class="setting-label">Voice Gender</span>
                             <select id="voiceGender" onchange="saveSetting('voiceGender', this.value)">
@@ -940,11 +1013,11 @@
                             </select>
                         </div>
                         <div class="setting-row">
-                            <span class="setting-label">Coaching Mode</span>
+                            <span class="setting-label">Countdown</span>
                             <select id="coachingMode" onchange="saveSetting('coachingMode', this.value)">
                                 <option value="phaseOnly">Phase Only</option>
-                                <option value="countdown">10s Countdown</option>
-                                <option value="full">Full Countdown</option>
+                                <option value="countdown">Last 10s</option>
+                                <option value="full">Every Second</option>
                             </select>
                         </div>
 
@@ -1028,30 +1101,60 @@
         let currentUser = null;
         let isSignUp = false;
 
-        // Speech Synthesis
+        // Voice Coaching System
         let synth = window.speechSynthesis;
+        let currentAudio = null;
 
-        function speak(text) {
+        const VOICE_COACHES = {
+            calm: { name: 'Calm', premium: false, phrases: { lower: 'Lower slowly', lift: 'Now lift', finalLower: 'Final lower', complete: 'Well done', encouragement: ['Keep breathing', 'Stay focused'] }},
+            standard: { name: 'Standard', premium: false, phrases: { lower: 'Lower', lift: 'Lift', finalLower: 'Lower', complete: 'Complete', encouragement: ['Good', 'Keep going'] }},
+            commander: { name: 'Commander', premium: true, phrases: { lower: 'Initiate descent! Slow and controlled!', lift: 'Drive it up! Full power!', finalLower: 'Final descent! Make it count!', complete: 'Mission accomplished! Outstanding work, soldier!', encouragement: ['Stay strong!', 'No surrender!'] }},
+            motivator: { name: 'Motivator', premium: true, phrases: { lower: 'Here we go! Nice and slow!', lift: 'Let\'s gooo! Push it!', finalLower: 'Last one! You got this!', complete: 'Yes! Crushed it! You\'re amazing!', encouragement: ['You\'re on fire!', 'Beast mode!'] }},
+            drill: { name: 'Drill Sergeant', premium: true, phrases: { lower: 'Down! Control that weight!', lift: 'Up! Move it!', finalLower: 'Down! Don\'t quit on me!', complete: 'Done! That\'s how it\'s done!', encouragement: ['No excuses!', 'Earn it!'] }},
+            zen: { name: 'Zen Master', premium: true, phrases: { lower: 'Descend mindfully... feel each moment', lift: 'Rise with intention... breathe', finalLower: 'One final journey down... embrace it', complete: 'Peace. You have honored your body today.', encouragement: ['Be present', 'Flow like water'] }}
+        };
+
+        function speak(text, phraseKey = null) {
+            if (currentAudio) { currentAudio.pause(); currentAudio = null; }
+            synth.cancel();
+            const coach = VOICE_COACHES[state.settings.voiceCoach] || VOICE_COACHES.calm;
+            let phrase = text;
+            if (phraseKey && coach.phrases[phraseKey]) phrase = coach.phrases[phraseKey];
+            speakWithSynthesis(phrase);
+        }
+
+        function speakWithSynthesis(text) {
             if (!synth) return;
             try {
-                synth.cancel();
                 const utterance = new SpeechSynthesisUtterance(text);
                 utterance.rate = 0.9;
-                utterance.pitch = 1;
                 const voices = synth.getVoices();
                 if (voices.length > 0) {
-                    let preferredVoice;
-                    if (state.settings.voiceGender === 'female') {
-                        preferredVoice = voices.find(v => v.name.toLowerCase().includes('samantha') || v.name.toLowerCase().includes('female'));
-                    } else {
-                        preferredVoice = voices.find(v => v.name.toLowerCase().includes('daniel') || v.name.toLowerCase().includes('male'));
-                    }
+                    let preferredVoice = state.settings.voiceGender === 'female' ?
+                        voices.find(v => v.name.toLowerCase().includes('samantha') || v.name.toLowerCase().includes('female')) :
+                        voices.find(v => v.name.toLowerCase().includes('daniel') || v.name.toLowerCase().includes('male'));
                     if (preferredVoice) utterance.voice = preferredVoice;
                 }
                 synth.speak(utterance);
-            } catch (e) {
-                console.warn('Speech synthesis error:', e);
-            }
+            } catch (e) { console.warn('Speech error:', e); }
+        }
+
+        function selectVoice(voiceId) {
+            const coach = VOICE_COACHES[voiceId];
+            if (!coach) return;
+            if (coach.premium && !state.isPremium) { alert('Upgrade to Pro to unlock premium voices!'); return; }
+            state.settings.voiceCoach = voiceId;
+            saveState();
+            updateVoiceUI();
+            speak(null, 'lower');
+        }
+
+        function updateVoiceUI() {
+            document.querySelectorAll('.voice-card').forEach(c => c.classList.remove('active'));
+            const id = 'voice' + (state.settings.voiceCoach || 'calm').charAt(0).toUpperCase() + (state.settings.voiceCoach || 'calm').slice(1);
+            const card = document.getElementById(id);
+            if (card) card.classList.add('active');
+            if (state.isPremium) document.querySelectorAll('.voice-card.premium').forEach(c => c.classList.add('unlocked'));
         }
 
         // Workout Data
@@ -1063,7 +1166,9 @@
         let state = {
             currentWorkout: 'A',
             completedExercises: [],
+            isPremium: false,
             settings: {
+                voiceCoach: 'calm',
                 voiceGender: 'male',
                 coachingMode: 'phaseOnly',
                 eccentricDuration: 30,
@@ -1079,6 +1184,7 @@
             loadState();
             renderExercises();
             updateStats();
+            updateVoiceUI();
             checkInstallBanner();
         });
 
@@ -1167,7 +1273,7 @@
         let timerSeconds = 30;
         let timerPhase = 0;
         let isRunning = false;
-        const PHASE_NAMES = ['Lower', 'Lift', 'Lower'];
+        const PHASE_KEYS = ['lower', 'lift', 'finalLower'];
 
         function resetTimer() {
             timerPhase = 0;
@@ -1193,10 +1299,9 @@
             isRunning = !isRunning;
             document.getElementById('timerPlayBtn').textContent = isRunning ? '⏸' : '▶';
             if (isRunning) {
-                speak(PHASE_NAMES[timerPhase]);
+                speak(null, PHASE_KEYS[timerPhase]);
                 timerInterval = setInterval(() => {
                     timerSeconds--;
-                    // Countdown based on coaching mode
                     if (state.settings.coachingMode === 'countdown' && timerSeconds <= 10 && timerSeconds > 0) {
                         speak(timerSeconds.toString());
                     } else if (state.settings.coachingMode === 'full' && timerSeconds > 0) {
@@ -1219,7 +1324,7 @@
             }
             const durations = [state.settings.eccentricDuration, state.settings.concentricDuration, state.settings.finalEccentricDuration];
             timerSeconds = durations[timerPhase];
-            speak(PHASE_NAMES[timerPhase]);
+            speak(null, PHASE_KEYS[timerPhase]);
         }
 
         function skipPhase() {
@@ -1234,7 +1339,7 @@
         }
 
         function completeExercise() {
-            speak('Complete! Great work!');
+            speak(null, 'complete');
             clearInterval(timerInterval);
             isRunning = false;
             const name = document.getElementById('timerExerciseName').textContent;
