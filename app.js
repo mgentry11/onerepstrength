@@ -1,5 +1,134 @@
-// HIT Coach Pro Web App - Matching iOS Native App
+// One Rep Strength Web App
 // Version 1.0.0
+
+// ===== SUPABASE CONFIG =====
+const SUPABASE_URL = 'https://xmiwutflnqwcvdztgnwm.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhtaXd1dGZsbnF3Y3ZkenRnbndtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjYwOTgwNDMsImV4cCI6MjA4MTY3NDA0M30.EZN99LIMDnveKkDW2Xi5icOfnaAMeT95gRLOWcVuzrc';
+
+let supabase = null;
+let currentUser = null;
+
+// Initialize Supabase client
+function initSupabase() {
+    if (window.supabase) {
+        supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        checkAuthState();
+    }
+}
+
+// ===== AUTH FUNCTIONS =====
+async function checkAuthState() {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session) {
+        currentUser = session.user;
+        showMainApp();
+    } else {
+        showAuthScreen();
+    }
+
+    // Listen for auth changes
+    supabase.auth.onAuthStateChange((event, session) => {
+        if (event === 'SIGNED_IN' && session) {
+            currentUser = session.user;
+            showMainApp();
+        } else if (event === 'SIGNED_OUT') {
+            currentUser = null;
+            showAuthScreen();
+        }
+    });
+}
+
+function showAuthScreen() {
+    document.getElementById('authScreen').classList.add('active');
+    document.getElementById('workoutListScreen').classList.remove('active');
+}
+
+function showMainApp() {
+    document.getElementById('authScreen').classList.remove('active');
+    document.getElementById('workoutListScreen').classList.add('active');
+    loadState();
+    renderExerciseList();
+    updateProgressDisplay();
+}
+
+function showAuthTab(tab) {
+    const loginTab = document.getElementById('loginTab');
+    const signupTab = document.getElementById('signupTab');
+    const loginForm = document.getElementById('loginForm');
+    const signupForm = document.getElementById('signupForm');
+
+    if (tab === 'login') {
+        loginTab.classList.add('active');
+        signupTab.classList.remove('active');
+        loginForm.style.display = 'flex';
+        signupForm.style.display = 'none';
+    } else {
+        loginTab.classList.remove('active');
+        signupTab.classList.add('active');
+        loginForm.style.display = 'none';
+        signupForm.style.display = 'flex';
+    }
+}
+
+async function handleLogin(event) {
+    event.preventDefault();
+    const email = document.getElementById('loginEmail').value;
+    const password = document.getElementById('loginPassword').value;
+    const errorEl = document.getElementById('loginError');
+    const submitBtn = event.target.querySelector('button[type="submit"]');
+
+    submitBtn.disabled = true;
+    errorEl.textContent = '';
+
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+
+    submitBtn.disabled = false;
+
+    if (error) {
+        errorEl.textContent = error.message;
+    }
+}
+
+async function handleSignup(event) {
+    event.preventDefault();
+    const email = document.getElementById('signupEmail').value;
+    const password = document.getElementById('signupPassword').value;
+    const confirm = document.getElementById('signupConfirm').value;
+    const errorEl = document.getElementById('signupError');
+    const submitBtn = event.target.querySelector('button[type="submit"]');
+
+    if (password !== confirm) {
+        errorEl.textContent = 'Passwords do not match';
+        return;
+    }
+
+    submitBtn.disabled = true;
+    errorEl.textContent = '';
+
+    const { data, error } = await supabase.auth.signUp({ email, password });
+
+    submitBtn.disabled = false;
+
+    if (error) {
+        errorEl.textContent = error.message;
+    } else if (data.user && !data.session) {
+        errorEl.style.color = '#22c55e';
+        errorEl.textContent = 'Check your email to confirm your account';
+    }
+}
+
+function continueAsGuest() {
+    currentUser = null;
+    showMainApp();
+}
+
+async function handleLogout() {
+    if (supabase && currentUser) {
+        await supabase.auth.signOut();
+    }
+    currentUser = null;
+    showAuthScreen();
+}
 
 // ===== WORKOUT DATA =====
 const WORKOUTS = {
@@ -69,11 +198,12 @@ let synth = window.speechSynthesis;
 
 // ===== INITIALIZATION =====
 document.addEventListener('DOMContentLoaded', () => {
-    loadState();
+    // Initialize Supabase auth first
+    initSupabase();
+
+    // Load settings (these work for guests too)
     loadPhaseSettings();
     loadVoiceSettings();
-    renderExerciseList();
-    updateProgressDisplay();
     updateStatusTime();
     setInterval(updateStatusTime, 60000);
 
